@@ -16,11 +16,14 @@ policy_templates
 *compiled.css
 *.ico
 *.xml
+*.jpg
 *kiys.js
 *.rtf
 *.png
 *-sav.js
 *-old.js
+*-sav.c
+*-old.c
 *-right.js
 *-wrong.js
 *-back.svg
