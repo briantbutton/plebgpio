@@ -6,13 +6,6 @@
 #include <math.h>
 
 
-// Select exactly one of the following flags
-#define TRELEDTWOBTN_A          0
-#define TWOLEDONEBTN_A          1
-#define TWOLEDONEBTN_B          0
-
-#define WAY                     1
-
 #define STATE_NOT_IN            0
 #define STATE_IN                1
 #define STATE_BAD               2
@@ -43,18 +36,20 @@
 #define MAX_PATH               50
 #define ZEROTXT                48
 #define ONETXT                 49
-#define FOURTXT                52
 #define forty                  40
 #define zero                    0
 #define one                     1
 #define four                    4
 #define five                    5
 #define six                     6
+#define eight                   8
 #define COMMANDCOUNT            6
-#define VALUECOUNT              9
+#define VALUECOUNT             17
 
 static char initialized       = zero;
 static char pattern           = zero;
+static char btn_pins          = zero;
+static char obj_avail         = zero;
 static char objNum            = five;
 static char objTyp            = OBJ_INVALID;
 static char colrVal           = VAL_NULL;
@@ -79,44 +74,120 @@ static int  argc_             = one;
                               //                              BTN1 == 2
                               //                              BTN2 == 1
 
-static char patterns[8][40]   = {
-                              // TWO LED ONE BTN B
-                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2
+static char pattrns[16][24]   = {
+                              //  ~   ~    ~     ~      ~       ~        ~         ~          ~           ~            ~             ~
+                              // The pattern is set at initialization
+                              // 
+                              // There are eight patterns, 0 - 7
+                              // If a pattern 8 is shown or entered, it means pattern 0
+                              // 
+                              // 
+                              // 
+                              // 2 LEDs 1 BTN B      https://www.button.network/gpio-guide/pinout/buttonnet21b.html
+                              // It uses narrow grouping and follows the order ground-red-green-blue for both LEDs.
+                              // This is for the prototype; the button placement, particularly, may change
+                              // Addendum:  I added a BTN on 17, please note that this will require an entry in config.txt
+                              // https://forums.raspberrypi.com/viewtopic.php?f=117&t=208748
+                              // 
+                              // gpio=17=pu
+                              // 
+                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
                               //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
-                                  {     17 ,    27 ,    22 ,    17 ,    25 ,     8 ,     7 ,    25 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
-                                  {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {     17 ,    27 ,    22 ,    22 ,    25 ,     8 ,     7 ,     7 ,    11 ,     9 ,    10 ,    10 ,     6 ,    16 ,    26 ,    26 ,    17 ,     4 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
                               //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
                               // TRE LED TWO BTN A
-                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2
+                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
                               //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
-                                  {     17 ,    27 ,    22 ,    17 ,    23 ,    24 ,    25 ,    23 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
-                                  {      1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {     17 ,    27 ,    22 ,    17 ,    23 ,    24 ,    25 ,    23 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {      1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
                               //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
                               // TWO LED ONE BTN A
-                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2
+                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
                               //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
-                                  {     17 ,    27 ,    22 ,    17 ,    23 ,    24 ,    25 ,    23 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
-                                  {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {     17 ,    27 ,    22 ,    17 ,    23 ,    24 ,    25 ,    23 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                              //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
+
+                              // 2 LEDs 1 BTN X    
+                              // This is the arrangment I mistakenly used for the first prototype
+                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
+                              //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
+                                  {     17 ,    27 ,    22 ,    17 ,     7 ,     8 ,    25 ,     7 ,    11 ,     9 ,    10 ,    11 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                              //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
+                              // TWO LED ONE BTN B
+                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
+                              //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
+                                  {     17 ,    27 ,    22 ,    17 ,    25 ,     8 ,     7 ,    25 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                              //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
+                              // TRE LED TWO BTN A
+                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
+                              //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
+                                  {     17 ,    27 ,    22 ,    17 ,    23 ,    24 ,    25 ,    23 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {      1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                              //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
+                              // TWO LED ONE BTN A
+                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
+                              //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
+                                  {     17 ,    27 ,    22 ,    17 ,    23 ,    24 ,    25 ,    23 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
                               //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
 
                               // TWO LED ONE BTN B
-                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2
+                              //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
                               //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
-                                  {     17 ,    27 ,    22 ,    17 ,    25 ,     8 ,     7 ,    25 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
-                                  {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 }
+                                  {     17 ,    27 ,    22 ,    17 ,    25 ,     8 ,     7 ,    25 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 },
+                                  {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 }
                               //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
                                 };
 
+//  ~   ~    ~     ~      ~       ~        ~         ~          ~           ~            ~             ~
+// If one wants buttons and lights to be auto-activated when a pattern is initialized, specify them here
+// The table is pretty self-explanatory
+static char initables[8][6][2]= {
+                                  { { OBJ_INVALID , 0 } , { OBJ_LED     , 1 } , { OBJ_LED     , 2 } , { OBJ_INVALID , 2 } , { OBJ_BTN     , 0 } , { OBJ_BTN     , 1 } } ,
+                                  { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } ,
+                                  { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } ,
+                                  { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } ,
+                                  { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } ,
+                                  { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } ,
+                                  { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } ,
+                                  { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } 
+                                };
 
-static char oct_highs[4]      = {     52 ,    53 ,    54 ,    55 };
+static char pattern_labels[8] = {     49 ,    50 ,    51 ,    52 ,    53 ,    54 ,    55 ,    56 };
 static char oct_lows[4]       = {     48 ,    49 ,    50 ,    51 };
 static char oct_ones[4]       = {     49 ,    51 ,    53 ,    55 };
 static char oct_twos[4]       = {     50 ,    51 ,    54 ,    55 };
 static char oct_fours[4]      = {     52 ,    53 ,    54 ,    55 };
+/*
+static char b36ins[128]       = {      0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,
+                                       0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     2 ,     3 ,     4 ,     5 ,     6 ,     7 ,     8 ,     9 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,
+                                       0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,    10 ,    11 ,    12 ,    13 ,    14 ,    15 ,    16 ,    17 ,    18 ,    19 ,    20 ,    21 ,    22 ,    23 ,    24 ,    25 ,    26 ,    27 ,    28 ,    29 ,    30 ,    31 ,    32 ,
+                                      33 ,    34 ,    35 ,     0 ,     0 ,     0 ,     0 ,     0 };
+                                      */
+static char b36tweens[128]    = {      0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,
+                                       0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,    48 ,    49 ,    50 ,    51 ,    52 ,    53 ,    54 ,    55 ,    48 ,    49 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,
+                                       0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,    50 ,    51 ,    52 ,    53 ,    54 ,    55 ,    48 ,    49 ,    50 ,    51 ,    52 ,    53 ,    54 ,    55 ,    48 ,    49 ,    50 ,    51 ,    52 ,    53 ,    54 ,    55 ,     0 ,
+                                       0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 };
+static char b36outs[36]       = {     48 ,    49 ,    50 ,    51 ,    52 ,    53 ,    54 ,    55 ,    56 ,    57 ,    97 ,    98 ,    99 ,   100 ,   101 ,   102 ,   103 ,   104 ,   105 ,   106 ,   107 ,   108 ,   109 ,   110 ,   111 ,   112 ,   113 ,   114 ,   115 ,   116 ,   117 ,   118 ,   119 ,   120 ,   121 ,   122 };
 
 
-static char vals[forty]       = {      0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 };
-static char activated[forty]  = {      0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 };
+static char vals[24]          = {      0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 };
+static char activated[24]     = {      0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 };
+
+
+                                        //                7               
+static char assigns[20]       = {        0 ,     0 ,     0 ,     0 , 
+                                        //               17
+                                         0 ,     0 ,     0 ,     0 ,     0 ,     0 ,
+                                        //                4
+                                         0 ,     0 ,     0 ,     0 ,     0 ,     0 ,
+                                        // for consistency
+                                         0 ,     0 ,     0 ,     0 };
+
 
 static char state[13]         = {     52 ,    48 ,    48 ,    48 ,    48 ,    48 ,    48 ,    48 ,    48 ,    48 ,    48 ,    48 ,     0 };
 static char indices[7]        = {      0 ,     1 ,     2 ,     3 ,     4 ,     5 ,     6 };
@@ -137,21 +208,30 @@ static char commands[6][12]   = {
                                     { CMD_READALL        ,     7 ,   114 ,   101 ,    97 ,   100 ,    97 ,   108 ,   108 ,     0 ,     0 ,     0 } , 
                                     { CMD_READ           ,     4 ,   114 ,   101 ,    97 ,   100 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } 
                                 };
-static char values[9][12]     = {
-                                    { VAL_ON             ,     2 ,   111 ,   110 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+static char values[17][12]   = {
                                     { VAL_OFF            ,     3 ,   111 ,   102 ,   102 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
-                                    { VAL_WHITE          ,     5 ,   119 ,   104 ,   105 ,   116 ,   101 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+                                    { VAL_OFF            ,     1 ,    48 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
                                     { VAL_BLUE           ,     4 ,    98 ,   108 ,   117 ,   101 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
-                                    { VAL_RED            ,     3 ,   114 ,   101 ,   100 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+                                    { VAL_BLUE           ,     1 ,    49 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
                                     { VAL_GREEN          ,     5 ,   103 ,   114 ,   101 ,   101 ,   110 ,     0 ,     0 ,     0 ,     0 ,     0 } , 
-                                    { VAL_YELLOW         ,     6 ,   121 ,   101 ,   108 ,   108 ,   111 ,   119 ,     0 ,     0 ,     0 ,     0 } , 
+                                    { VAL_GREEN          ,     1 ,    50 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
                                     { VAL_CYAN           ,     4 ,    99 ,   121 ,    97 ,   110 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } , 
-                                    { VAL_MAGENTA        ,     7 ,   109 ,    97 ,   103 ,   101 ,   110 ,   116 ,    97 ,     0 ,     0 ,     0 } 
+                                    { VAL_CYAN           ,     1 ,    51 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+                                    { VAL_RED            ,     3 ,   114 ,   101 ,   100 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+                                    { VAL_RED            ,     1 ,    52 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+                                    { VAL_MAGENTA        ,     7 ,   109 ,    97 ,   103 ,   101 ,   110 ,   116 ,    97 ,     0 ,     0 ,     0 } ,
+                                    { VAL_MAGENTA        ,     1 ,    53 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+                                    { VAL_YELLOW         ,     6 ,   121 ,   101 ,   108 ,   108 ,   111 ,   119 ,     0 ,     0 ,     0 ,     0 } , 
+                                    { VAL_YELLOW         ,     1 ,    54 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+                                    { VAL_WHITE          ,     5 ,   119 ,   104 ,   105 ,   116 ,   101 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+                                    { VAL_WHITE          ,     2 ,   111 ,   110 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } ,
+                                    { VAL_WHITE          ,     1 ,    55 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 } 
                                 };
 static char cmds[6]           = { CMD_INITIALIZE , CMD_ACTIVATE , CMD_DEACTIVATE , CMD_WRITE , CMD_READ , CMD_READALL };
-static char test1[5]          = {   VAL_WHITE ,      VAL_ON ,     VAL_RED ,  VAL_YELLOW , VAL_MAGENTA };
-static char test2[5]          = {   VAL_WHITE ,   VAL_GREEN ,   VAL_GREEN ,  VAL_YELLOW ,    VAL_CYAN };
-static char test3[5]          = {   VAL_WHITE ,    VAL_BLUE ,    VAL_BLUE , VAL_MAGENTA ,    VAL_CYAN };
+static char test1[5]          = {   VAL_WHITE ,     VAL_RED ,  VAL_YELLOW , VAL_MAGENTA };
+static char test2[5]          = {   VAL_WHITE ,   VAL_GREEN ,  VAL_YELLOW ,    VAL_CYAN };
+static char test3[5]          = {   VAL_WHITE ,    VAL_BLUE , VAL_MAGENTA ,    VAL_CYAN };
+static char test4[5]          = {   VAL_WHITE ,    VAL_BLUE ,    VAL_BLUE ,    VAL_BLUE };
 /*
   COMPILE
   $ gcc -Wall -Wno-char-subscripts gpio.c -o gpio
@@ -161,17 +241,21 @@ static char test3[5]          = {   VAL_WHITE ,    VAL_BLUE ,    VAL_BLUE , VAL_
   $ sudo chown root:service /sbin/gpio
   $ sudo chmod 4755 /sbin/gpio
 
-              $ sudo setcap cap_fowner+ep /sbin/gpio
-              $ sudo setcap cap_chown+ep /sbin/gpio
-              $ sudo setcap "cap_fowner,cap_chown+ep" /sbin/gpio
+  $ sudo cat /sys/kernel/debug/gpio
+
+
+                $ sudo setcap cap_fowner+ep /sbin/gpio
+                $ sudo setcap cap_chown+ep /sbin/gpio
+                $ sudo setcap "cap_fowner,cap_chown+ep" /sbin/gpio
+
 
   INVOKE
   Initialize
-  $ export GPIO="";export GPIO=$(gpio initialize);echo $GPIO
+  $ export GPIO="";export GPIO=$(gpio initialize 8);echo $GPIO
   Activate
-  $ export GPIO=$(gpio activate led0 $GPIO);echo $GPIO
+  $ export GPIO=$(gpio activate led1 $GPIO);echo $GPIO
   Set Value
-  $ export GPIO=$(gpio write led0 $GPIO red);echo $GPIO
+  $ export GPIO=$(gpio write led1 $GPIO red);echo $GPIO
   Read Value
   $ export GPIO=$(gpio read btn0 $GPIO);echo $GPIO
   Read Values
@@ -179,7 +263,7 @@ static char test3[5]          = {   VAL_WHITE ,    VAL_BLUE ,    VAL_BLUE , VAL_
 */
 
 // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
-//   FILE                              FILE                                FILE
+//   FILE                               FILE                                 FILE
 void file_write(char *path, char *buff, char len) {
   FILE    *mb;
   int     i                   = 0,
@@ -210,7 +294,7 @@ void file_read(char *path, char *buff, int len) {
     fclose(fp);
   }
 }
-//   FILE                              FILE                                FILE
+//   FILE                               FILE                                 FILE
 // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
 
 
@@ -235,15 +319,21 @@ char member_of(char val, char* choices, char count)
   if ( count==six )
     if ( val==choices[0] || val==choices[1] || val==choices[2] || val==choices[3] || val==choices[4] || val==choices[5] )
       member                  = 1;
+  if ( count==eight )
+    if ( val==choices[0] || val==choices[1] || val==choices[2] || val==choices[3] || val==choices[4] || val==choices[5] || val==choices[6] || val==choices[7] )
+      member                  = 1;
   return member;
 }
 char oct_subpart(char val, char* choices){
   return member_of(val,choices,four);
 }
+char recognized_pattern(char cmd) {
+  return member_of(cmd,pattern_labels,eight);
+}
 char recognized_command(char cmd) {
   return member_of(cmd,cmds,six);
 }
-int shift_indices(int index) {
+char shift_indices(char index) {
   argc_                       = argc_ - 1;
   if(index<2)   indices[1]    = indices[2];
   if(index<3)   indices[2]    = indices[3];
@@ -265,18 +355,27 @@ char digits(char pin) {
     return 1;
   }
 }
-char octal_value(char* array, int offset){
+char octal_value(char* array, int offset, int assign) {
   char    octal               = 0;
-  if ( array[offset+0] == 1 || array[offset+3] == 1 )
+  if ( array[offset+0] == 1 )
     octal                     = octal+4;
   if ( array[offset+1] == 1 )
     octal                     = octal+2;
-  if ( array[offset+2] == 1 )
+  if ( array[offset+2] == 1 || array[offset+3] == 1 )
     octal                     = octal+1;
-  return octal+ZEROTXT;
+
+  if ( assigns[assign+0] == 1 ) {
+    octal                     = octal+16;
+    assigns[assign+0]         = 0;
+  }
+  if ( assigns[assign+1] == 1 ) {
+    octal                     = octal+8;
+    assigns[assign+1]         = 0;
+  }
+
+  return b36outs[octal];
 }
-void assemble_path(char *path, char *a, char al, char *b, char bl, char *c, char cl)
-{
+void assemble_path(char *path, char *a, char al, char *b, char bl, char *c, char cl){
   int i;
   for (i=0; i<MAX_PATH; i++)      path[i]        = 0;
   for (i=0; i<al; i++)            path[i]        = a[i];
@@ -288,7 +387,7 @@ char match_string(char* a, char* b, char bl){
   char    matches             = 0;
   if(strlen(a)==bl){
     matches                   = 1;
-    while(i<bl&&matches==1){
+    while ( i<bl && matches==1 ) {
       if(a[i]!=b[i])
         matches               = 0;
       i                       = i+1;
@@ -305,6 +404,14 @@ char select_from_list(char* c, char (*list)[12], char defalt, int count){
     i                         = i+1;
   }
   return res;
+}
+void set_pattern_from_state0(){
+  char    stateNum            = state[0] - ZEROTXT;
+  if ( stateNum==eight ){
+    pattern                   = 0;
+  } else {
+    pattern                   = 2 * stateNum;
+  }
 }
 // Returns 1 for led and 2 for btn; 0 for invalid
 void set_obj_type(char cmd, char *arg2){
@@ -334,22 +441,19 @@ void set_obj_type(char cmd, char *arg2){
     }
   }
 }
-void initialize_system(){
-  initialized                 = 1;
-}
 void set_obj_state(char* array, char c, char o){
-  char*   available           = patterns[pattern+1];
-  if ( oct_subpart(c,oct_fours)==1 ) {
-    if(available[o+0]==1){
-      array[o+0]          = 1;
+  char*   available           = pattrns[pattern+1];
+  if ( oct_subpart(c,oct_fours)==1 )
+    array[o+0]            = 1;
+  if ( oct_subpart(c,oct_twos)==1 ) 
+    array[o+1]            = 1;
+  if ( oct_subpart(c,oct_ones)==1 ) {
+    if(available[o+2]==1){
+      array[o+2]          = 1;
     }else{
       array[o+3]          = 1;      
     }
   }
-  if ( oct_subpart(c,oct_twos)==1 ) 
-    array[o+1]            = 1;
-  if ( oct_subpart(c,oct_ones)==1 ) 
-    array[o+2]            = 1;
 }
 void set_led_activ(char c, char o){
   set_obj_state(activated,c,o);
@@ -377,11 +481,75 @@ char parse_state(char *state){
 }
 
 
+
+// *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
+//  MESSAGE                          MESSAGE                              MESSAGE
+void copy3_to_assigns(char base, char num1, char num2, char num3) {
+  assigns[base+0]             = num1;
+  assigns[base+1]             = num2;
+  assigns[base+2]             = num3;
+}
+void copy4_to_assigns(char base, char num1, char num2, char num3, char num4) {
+  assigns[base+0]             = num1;
+  assigns[base+1]             = num2;
+  assigns[base+2]             = num3;
+  assigns[base+3]             = num4;
+}
+void msg_btn_pins() {
+  char*   pins                = pattrns[pattern+0];
+  char*   available           = pattrns[pattern+1];
+  char    offset,ref;
+  if ( available[btn_offset(0)]==1 ) {
+    assigns[1]                = 1;
+    assigns[3]                = 1;
+    offset                    = 4;
+    ref                       = pins[btn_offset(0)];
+    // printf("btn0 is available at pin %d\n",ref);
+    copy3_to_assigns(offset, ((ref & 32) >> 5) , ((ref & 16) >> 4), ((ref &  8) >> 3));
+    copy3_to_assigns(offset, ((ref &  4) >> 2) , ((ref &  2) >> 1), ((ref &  1) >> 0));
+  }
+  if ( available[btn_offset(1)]==1 ) {
+    assigns[1]                = 1;
+    assigns[2]                = 1;
+    offset                    = 10;
+    ref                       = pins[btn_offset(1)];
+    // printf("btn1 is available at pin %d\n",ref);
+    copy3_to_assigns(offset, ((ref & 32) >> 5) , ((ref & 16) >> 4), ((ref &  8) >> 3));
+    copy3_to_assigns(offset, ((ref &  4) >> 2) , ((ref &  2) >> 1), ((ref &  1) >> 0));
+  }
+  btn_pins                    = 1;
+}
+void msg_obj_avail() {
+  char*   available           = pattrns[pattern+1];
+  char    offset;
+  copy4_to_assigns(0,1,1,1,1);
+  offset                      = 4;
+  if ( available[led_offset(0)+2]==1 || available[led_offset(0)+3]==1 ) 
+    assigns[offset+2]         = 1;
+  if ( available[led_offset(1)+2]==1 || available[led_offset(1)+3]==1 ) 
+    assigns[offset+3]         = 1;
+  if ( available[led_offset(2)+2]==1 || available[led_offset(2)+3]==1 ) 
+    assigns[offset+4]         = 1;
+  if ( available[led_offset(3)+2]==1 || available[led_offset(3)+3]==1 ) 
+    assigns[offset+5]         = 1;
+  offset                      = 10;
+  if ( available[btn_offset(0)]==1 ) 
+    assigns[offset+3]         = 1;
+  if ( available[btn_offset(1)]==1 ) 
+    assigns[offset+4]         = 1;
+  if ( available[btn_offset(2)]==1 ) 
+    assigns[offset+5]         = 1;
+  obj_avail                   = 1;
+}
+//  MESSAGE                          MESSAGE                              MESSAGE
+// *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
+
+
 // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
 //  ACTIVATE                           ACTIVATE                          ACTIVATE
 void deactivate_obj(char count, int offset) {
-  char*   pins                = patterns[pattern+0];
-  char*   available           = patterns[pattern+1];
+  char*   pins                = pattrns[pattern+0];
+  char*   available           = pattrns[pattern+1];
   char    i                   = 0,index,pin;
   while ( i < count ) {
     index                     = i+offset;
@@ -395,8 +563,8 @@ void deactivate_obj(char count, int offset) {
   }
 }
 char activate_obj(char count, int offset, char *dir) {
-  char*   pins                = patterns[pattern+0];
-  char*   available           = patterns[pattern+1];
+  char*   pins                = pattrns[pattern+0];
+  char*   available           = pattrns[pattern+1];
   char*   asciipin;
   char    i                   = 0,
           availabl            = 0,len,index,pin;
@@ -474,16 +642,16 @@ void deactivate(char obj, char num){
 
 // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
 //  LED / BTN                         LED / BTN                         LED / BTN
-void set_led_color(int index, char val, char* choices){
-  char*   pins                = patterns[pattern+0];
-  char*   available           = patterns[pattern+1];
+void set_led_pin(int index, char val, char* choices){
+  char*   pins                = pattrns[pattern+0];
+  char*   available           = pattrns[pattern+1];
   char    pin                 = pins[index],
           n                   = 0;
   char    asciival[2]         = { ZEROTXT ,  0 };
   char    path[MAX_PATH];
   char*   asciipin            = asciipins[pin];
   if ( available[index]==1 && activated[index]==1 ) {
-    if ( member_of(val,choices,five)==1 ){
+    if ( member_of(val,choices,four)==1 ){
       n                       = 1;
       asciival[0]             = ONETXT;
     }
@@ -497,14 +665,14 @@ void set_led_color(int index, char val, char* choices){
 }
 void set_led(char ledNum, char val){
   int     ledOffset           = led_offset(ledNum);
-  set_led_color(ledOffset+0,val,test1);
-  set_led_color(ledOffset+3,val,test1);
-  set_led_color(ledOffset+1,val,test2);
-  set_led_color(ledOffset+2,val,test3);
+  set_led_pin(ledOffset+0,val,test1);
+  set_led_pin(ledOffset+3,val,test4);
+  set_led_pin(ledOffset+1,val,test2);
+  set_led_pin(ledOffset+2,val,test3);
 }
 void get_btn(char btnNum){
-  char*   available           = patterns[pattern+1];
-  char*   pins                = patterns[pattern+0];
+  char*   available           = pattrns[pattern+1];
+  char*   pins                = pattrns[pattern+0];
   char*   asciipin;
   char    btnOffset           = btn_offset(btnNum),
           pin                 = pins[btnOffset];
@@ -525,52 +693,83 @@ void read_btn(char btnNum){
 void read_btns(){
   get_btn(0);
   get_btn(1);
+  get_btn(2);
 }
 //  LED / BTN                         LED / BTN                         LED / BTN
 // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
 
 
+
+// *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
+//  INITIALIZE                       INITIALIZE                        INITIALIZE
+void initialize_system(){
+  char    (*initable)[2]      = initables [ pattern / 2 ];
+  char*   pair;
+  char    i                   = 0,
+          lim                 = 6;
+  while ( i < lim ) {
+    pair                      = initable[i++];
+    if ( pair[0]==OBJ_LED || pair[0]==OBJ_BTN ) {
+      activate ( pair[0] , pair[1] );
+    }
+  }
+  initialized                 = 1;
+}
+//  INITIALIZE                       INITIALIZE                        INITIALIZE
+// *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
+
+
 void pre_parse_arguments(int argc, char** argv){
-  int     i                   = -1,
-          l                   = argc-1,
-          ii                  = -1,
-          ll                  = 11,
-          maybe               = 1,
-          offset              = 0;
+  char    offset              = 0,
+          i                   = 0,
+          l                   = argc,
+          ll                  = 12,
+          maybe               = 1,ii,aiii;
   char*   ai;
   argc_                       = argc;
-  while(l>i++){
+  while(l>i){
     if(strlen(argv[i])==7||strlen(argv[i])==12){
       ai                      = argv[i];
-      if(is_verbose(ai)==1){
+      if ( is_verbose(ai)==1 ) {
         verbose               = 1;
         offset                = shift_indices(i+offset);
       }
-      if ( strlen(ai)==12 && oct_subpart(ai[0],oct_highs)==1 ) {
-        while ( maybe==1 && ll>ii++ ) {
-          if(ai[ii]>47&&ai[ii]<56){
-            state[ii]         = ai[ii];
+      if ( strlen(ai)==12 && recognized_pattern(ai[0])==1 ) {
+        ii                    = 0;
+        state[ii++]           = ai[0];
+        while ( maybe==1 && ll>ii ) {
+          aiii                = ai[ii];
+          if ( ( aiii>47 && aiii<58 ) || ( aiii>96 && aiii<119 ) ) {
+            state[ii]         = b36tweens[aiii];                         // Strips off higher-order bits
           }else{
             maybe             = 0;
           }
-          if ( maybe==1 && ii==ll )
-            if ( oct_subpart(ai[ii],oct_ones)==1 )
+          if ( maybe==1 && ii==ll-1 ) {
+            if ( oct_subpart(aiii,oct_ones)==1 )
               initialized     = 1;
+            if ( oct_subpart(aiii,oct_twos)==1 )
+              btn_pins        = 1;
+            if ( oct_subpart(aiii,oct_fours)==1 )
+              obj_avail       = 1;
+          }
+          ii                  = ii + 1;
         }
-        if(maybe==1){
+        if ( maybe==1 ) {
           statestate          = STATE_IN;
           offset              = shift_indices(i+offset);
-          pattern             = state[0] - FOURTXT;
+          set_pattern_from_state0();
         }else{
           statestate          = STATE_BAD;
         }
       }
     }
+    i                         = i+1;
   }
 }
 char parse_arguments(int argc, char** argv){
-  char    cmd                 = CMD_EMPTY;
-  char    hasState            = 0,argv20;
+  char    cmd                 = CMD_EMPTY,
+          hasState            = 0,
+          shim                = 0,argv20;
   char*   arg2                = "no";
   char*   arg3;
 
@@ -580,11 +779,15 @@ char parse_arguments(int argc, char** argv){
     cmd                       = select_from_list(argv[indices[1]],commands,CMD_EMPTY,COMMANDCOUNT);
 
   if ( cmd==CMD_INITIALIZE ) {
+    cmd                       = CMD_ERROR_SYNTAX;
       if ( argc_>2 && strlen(argv[2])==1 ) {
         argv20                = argv[2][0];
-        if ( oct_subpart(argv20,oct_lows)==1 ){
-          state[0]            = four + argv20;
-          pattern             = state[0] - FOURTXT;
+        if ( recognized_pattern(argv20)==1 || argv20==ZEROTXT ) {
+          cmd                 = CMD_INITIALIZE;
+          if ( argv20==ZEROTXT ) 
+            shim              = eight;
+          state[0]            = shim + argv20;
+          set_pattern_from_state0();
         }
       }
   } else {
@@ -605,8 +808,6 @@ char parse_arguments(int argc, char** argv){
       }
     }
     if ( cmd==CMD_WRITE && hasState==1 && argc_>3 ) {
-      // fprintf(stderr,"argc_ == %d, indices[3] == %d, indices[4] == %d  \n",argc_,indices[3],indices[4]);
-      // fprintf(stderr,"argv[%d] == %s, argv[%d] == %s  \n\n\n",indices[3],argv[indices[3]],indices[4],argv[indices[4]]);
       arg3                    = argv[indices[3]];
       colrVal                 = select_from_list(arg3,values,VAL_NULL,VALUECOUNT);
     }
@@ -622,7 +823,8 @@ char parse_arguments(int argc, char** argv){
 int main(int argc, char **argv) {
   char    cmd                 = parse_arguments(argc,argv);
   int     i                   = -1,
-          l                   = 4;
+          l                   = 4,
+          info_bits           = 0,i2,i4;
 
   if ( cmd==CMD_INITIALIZE )     initialize_system();
   if ( cmd==CMD_ACTIVATE )       activate(objTyp,objNum);
@@ -636,13 +838,29 @@ int main(int argc, char **argv) {
   if ( cmd==CMD_ERROR_SYNTAX )   fprintf(stderr,"SYNTAX ERROR \n\n\n");
 
   if ( recognized_command(cmd) ) {
+
+    if ( obj_avail==0 ) {
+      msg_obj_avail();
+    } else {
+      if ( btn_pins==0 ) {
+        msg_btn_pins();
+      }
+    }
+
     if ( initialized==1 )
-      state[11]               = ONETXT;
+      info_bits               = info_bits+1;
+    if ( btn_pins==1 )
+      info_bits               = info_bits+2;
+    if ( obj_avail==1 )
+      info_bits               = info_bits+4;
+    state[11]                 = b36outs[info_bits];
 
     while ( l>i++ ) {
-      state[i+i+1]            = octal_value(activated,i*4);
-      state[i+i+2]            = octal_value(vals,i*4);
-    }
+      i2                      = i+i;
+      i4                      = i2+i2;
+      state[i2+1]             = octal_value(activated,i4,i4);
+      state[i2+2]             = octal_value(vals,i4,i4+2);
+    } 
   }
   printf("%s",state);
 }
