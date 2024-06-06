@@ -91,24 +91,28 @@ static char pattrns[16][24]   = {
                               // 
                               // gpio=17=pu
                               // 
+                              // 
+                              //  PATTERN0: LED1, LED2 and BTN0     (requires 'gpio=17=pu' in config.txt)
                               //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
                               //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
                                   {     17 ,    27 ,    22 ,    22 ,    25 ,     8 ,     7 ,     7 ,    11 ,     9 ,    10 ,    10 ,     6 ,    16 ,    26 ,    26 ,    17 ,     4 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
                                   {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
                               //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
+                              // 
                               // TRE LED TWO BTN A
                               //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
                               //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
                                   {     17 ,    27 ,    22 ,    17 ,    23 ,    24 ,    25 ,    23 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 },
                                   {      1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
                               //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
+                              // 
                               // TWO LED ONE BTN A
                               //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
                               //        R       G       B       W       R       G       B       W       R       G       B       W       R       G       B       W
                                   {     17 ,    27 ,    22 ,    17 ,    23 ,    24 ,    25 ,    23 ,    10 ,     9 ,    11 ,    10 ,     6 ,    16 ,    26 ,     6 ,     0 ,     1 ,     5 ,     0 ,     0 ,     0 ,     0 ,     0 },
                                   {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     1 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 },
                               //        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      17      18      19      20      21      22      23      24      25      26      27      28      29 
-
+                              // 
                               // 2 LEDs 1 BTN X    
                               // This is the arrangment I mistakenly used for the first prototype
                               //        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~       ~  ~  ~   LED-3   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
@@ -147,7 +151,7 @@ static char pattrns[16][24]   = {
 // If one wants buttons and lights to be auto-activated when a pattern is initialized, specify them here
 // The table is pretty self-explanatory
 static char initables[8][6][2]= {
-                                  { { OBJ_INVALID , 0 } , { OBJ_LED     , 1 } , { OBJ_LED     , 2 } , { OBJ_INVALID , 2 } , { OBJ_BTN     , 0 } , { OBJ_BTN     , 1 } } ,
+                                  { { OBJ_LED     , 1 } , { OBJ_LED     , 2 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_BTN     , 0 } , { OBJ_BTN     , 0 } } ,
                                   { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } ,
                                   { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } ,
                                   { { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } , { OBJ_INVALID , 0 } } ,
