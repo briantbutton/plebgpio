@@ -67,10 +67,16 @@ char count_led_lines(bn_gpio_led* led){
 }
 char count_btn_lines(bn_gpio_btn* btn){
   char    actv                = 0;
-  printf("count_btn_lines, btn%d hot is pin %d\n",btn->num,btn->hot->pin);
   if ( btn->hot->pin>0 ) {
     count_line(btn->hot);
     actv                      = 1;
+#if VERBOSE == 3
+    printf("count_btn_lines, btn%d hot is pin %d\n",btn->num,btn->hot->pin);
+#endif
+  } else {
+#if VERBOSE == 3
+    printf("count_btn_lines, btn%d is inactive\n",btn->num);
+#endif
   }
   btn->actv                   = actv;
   return actv;
@@ -100,6 +106,7 @@ void print_btn(bn_gpio_btn* btn){
   }
 }
 void print_config(){
+#if VERBOSE == 2 || VERBOSE == 3
   printf("\nconfig.curr_weight == %d, config.line_count == %d\n",config.curr_weight,config.line_count);
   print_led(config.led0);
   print_led(config.led1);
@@ -117,6 +124,7 @@ void print_config(){
   printf("offset 6 has pin #%d\n",config.offsets[6]->pin);
   printf("offset 7 has pin #%d\n",config.offsets[7]->pin);
   printf("\n");
+#endif
 }
 void count_lines(){
   config.line_count           = 0;

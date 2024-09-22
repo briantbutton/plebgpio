@@ -71,8 +71,7 @@ int gpio_line_cfg_ioctl (gpio_v2_t *gpio)
  */
 int prn_gpio_v2_ghip_info (int gpiofd)
 {
-  __u8  rows = 0,
-        remstart = 0;
+  __u8  rows = 0;
   struct gpiochip_info chip_info = { .name = "" };
 
   /* gpio_v2 ioctl call to get chip information */
@@ -86,7 +85,9 @@ int prn_gpio_v2_ghip_info (int gpiofd)
     fputs ("error: GPIO_GET_CHIPINFO_IOCTL no GPIO lines.\n", stderr);
     return -1;
   }
-  remstart = rows * INFOCOLS;   /* compute no. of rows to print at end */
+
+#if VERBOSE == 3
+__u8 remstart = rows * INFOCOLS;    /* compute no. of rows to print at end */
 
   /* output chip information */
   printf ("\nGPIO chip information\n\n"
@@ -121,6 +122,7 @@ int prn_gpio_v2_ghip_info (int gpiofd)
     printf ("  %2hhu :  %-18s", c, line_info.name);
   }
   puts ("\n");    /* tidy up with an additional (2) newlines */
+#endif
 
   return 0;
 }
@@ -179,24 +181,23 @@ int gpio_line_set_values (gpio_v2_t *gpio, __u64 bits,  __u64 mask)
  * linereq->bits for bits specified in mask.
  * @return returns 0 on success, -1 otherwise.
  */
-int gpio_line_get_values (gpio_v2_t *gpio, __u64 bits,  __u64 mask)
-{
+int gpio_line_get_values (gpio_v2_t *gpio, __u64 bits,  __u64 mask) {
 
   gpio->linevals->bits = bits;
-
   gpio->linevals->mask = mask;
-
   if (ioctl (gpio->linereq->fd, GPIO_V2_LINE_GET_VALUES_IOCTL, gpio->linevals) < 0) {
     perror ("ioctl-GPIO_V2_LINE_GET_VALUES_IOCTL-1");
     return -1;
   }
   bits   = gpio->linevals->bits;
   if ( bits!=old_bits ) {
+#if VERBOSE == 3
     if ( ( bits & bits ) > 0 ){
       printf("'bits' is non-zero   %d\n",bits);
     }else{
       printf("'bits' is zero   %d\n",bits);
     }
+#endif
     old_bits = bits;
   }
   return old_bits;
