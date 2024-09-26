@@ -1,85 +1,75 @@
 # plebgpio
 
-plebgpio provides a high level API for GPIO operation of LEDs and buttons.&nbsp; 
-It can be run from Bash (Unix shell) or NodeJS.&nbsp; 
+**plebgpio** provides a high level API for GPIO operation of LEDs and buttons, using the v2 ioctl interface ( aka GPIO Character Device Userspace API &mdash; https://www.kernel.org/doc/html/latest/userspace-api/gpio/chardev.html ).&nbsp; 
+It is designed to run in background; communication is done with a simple file interface.&nbsp; 
 
-Key features:&nbsp;   
-&bull;  The interface works with buttons and LEDs, not GPIO pins&nbsp;  
-&bull;  Operating plebgpio does not require root privileges&nbsp;  
-&bull;  The NodeJS module has a lighweight button interrupt capability
+**plebgpio** is dedicated to supporting buttons and leds, nothing more.&nbsp; 
+However, in that space, you might find it is easy to use and powerful.&nbsp; 
+It supports single-color, two-color or three-color LEDs, and user-pressable buttons.&nbsp; 
+Up to four LEDs and three buttons are supported.&nbsp; 
 
-## WIP
+The LEDs may be set by poking octal values into intuitively-named files (e.g. `led0`).&nbsp; 
+Likewise, the buttons may be sampled by reading a binary value from a file.&nbsp; 
+Mapping between GPIO pins and LEDs or buttons are done with a config file.&nbsp; 
+All of these files are in the same **pleb** directory (`/etc/bn/gpio`).
 
-This is not commplete.&nbsp;
-&apos;plebgpio&apos; C code is fine but the Javascript code is not.
+This means that the user code has a very simple UI, reading and writing a couple named files to observe buttons and control LEDs.&nbsp; 
 
-It was developed for Ubuntu Linux but *may* run on other distributions&nbsp;
+**plebgpio** is launched with systemd.&nbsp; 
+After launch, it periodically reads and writes values to and from the LED and button files, also updating the values in the GPIO pins accordingly.&nbsp; 
+Normally, the period is 125ms, plenty fast enough for humans, although it can be configured to 62.5ms.&nbsp; 
 
 
-## Concepts
+## In overview
 
-### No sudo
+### Configure
 
-While root privilege is required to install 'plebgpio', it is not required to invoke it.&nbsp; 
+The first step is to configure **plebgpio**, by editing `config.txt` in the **pleb** directory.&nbsp; 
+Configuration permits you to define LEDs (up to 4) and buttons (up to 3).&nbsp; 
+For LEDs, one must specify the number of colors, and name the active GPIO pin(s).&nbsp; 
+If your first LED (led0) is simple red LED with the power pin at GPIO #25, the config entries will look like this:&nbsp; 
 
-### Stateless binary program
+	[led0]
+	colors=1
+	pwr=25
 
-Normal operation is done by invoking a compiled program ('plebgpio') from the shell or from NodeJS.&nbsp; 
-Parameters tell 'plebgpio' what to do.&nbsp; 
-The program iself holds no state.&nbsp; 
-Instead, the calling utility hands in parameters representing a command, and the current state.&nbsp; 
-The program executes the command and hands back a new state.&nbsp;
+Whoops!&nbsp; 
+That was easy.&nbsp; 
 
-So a series of shell calls would look like this.
+Specifying a button is similar.&nbsp; 
 
-	export GPIO="";export GPIO=$(plebgpio initialize 1);
-	export GPIO=$(plebgpio write led1 $GPIO red)
+	[btn0]
+	hot=17
 
-The shell variable GPIO holds the state information.
+_(Note that ground pins are never specified.)_&nbsp; 
 
-### Built-in structure
+When **plebgpio** starts up, it will read `config.txt`, and behave accordingly.&nbsp; 
 
-plebgpio is controlled with reference to LEDs and BTNs, not pins.&nbsp; 
-The mapping from one to another is coded into the program iself.&nbsp; 
-In fact, there are eight mappings available.&nbsp; 
-The actual mapping is selected with the initialize command, e.g.&nbsp;
+### Operate
 
-	plebgpio initialize 1
+Operation is done through reading and writing single characters in named files in the **pleb** directory.&nbsp; 
 
-This means that plebgpio might not be right for someone casually experimenting with different configurations on a breadboard.&nbsp; 
-However, if you can restrict yourself to two or five wiring plans, they are easy to specify.&nbsp; 
+Readable files include:&nbsp;  
+&#9679; **btn0** &nbsp;  
+&#9679; **btn1** &nbsp;  
+&#9679; **btn2** &nbsp;  
 
-## Commands
+Writable files include:&nbsp;  
+&#9679; **led0** &nbsp;  
+&#9679; **led1** &nbsp;  
+&#9679; **led2** &nbsp;  
+&#9679; **led3** &nbsp;  
+&#9679; **prog** &nbsp;  
 
-### Initialize
+_(Programs are an advanced way to display LED behavior, see below.)_&nbsp; 
 
-The command sequence always starts with an initialize.  Without it, nothing runs.  The formula:
+## Installation
 
-	plebgpio initialize [1-8]
+(coming back here)
 
-How it looks in bash *(specifying wiring pattern number #3)*.
 
-	export GPIO="";export GPIO=$(plebgpio initialize 3);
-
-### Write LED
-
-plebgpio supports configuration of up to four LEDs.  
-
-	plebgpio initialize [1-8]
-
-How it looks in bash *(specifying wiring pattern number #3)*.
-
-	export GPIO="";export GPIO=$(plebgpio initialize 3);
-
+## Acknowlegements
 
 
 
-
-	//        ~  ~  ~   LED-0   ~  ~  ~       ~  ~  ~   LED-1   ~  ~  ~       ~  ~  ~   LED-2   ~  ~  ~     BTN-0   BTN-1   BTN-2  empty
-	//        R       G       B       W       R       G       B       W       R       G       B       W
-	    {     17 ,    27 ,    22 ,    22 ,    25 ,     8 ,     7 ,     7 ,    11 ,     9 ,    10 ,    10 ,    17 ,     4 ,     0 ,     0  },
-	    {      0 ,     0 ,     0 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     1 ,     1 ,     0 ,     1 ,     0 ,     0 ,     0  },
-	//        0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16      
-
-The first row gives pin numbers and the second row are bits to say what pins are available to plebgpio.
 

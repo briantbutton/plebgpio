@@ -77,7 +77,7 @@ char read_file_digit(char *dir, char *subdir, char *fname){
     }
   }
   if( found==1 ){
-    if (result!=program) printf("'%s' has value %d\n",fname,result);
+    // if (result!=program) printf("'%s' has value %d\n",fname,result);
   }else{
     // printf("'%s' not found  (%s)\n",fname,fullpath);
   }
@@ -115,9 +115,13 @@ char verify_dir_exists(char *path){
   if(dp){
     closedir(dp);
     exists                    = 1;
+#if VERBOSE == 3
     printf("found directory exists '%s'\n",path);
+#endif
   }else{
+#if VERBOSE == 1 || VERBOSE == 2 || VERBOSE == 3
     printf("did not find directory '%s'\n",path);
+#endif
   }
   return exists;
 }

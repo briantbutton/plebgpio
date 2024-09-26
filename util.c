@@ -1,4 +1,39 @@
 
+int  unmatched_sect ( int is ) {
+  if ( is==0 ) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+int  led_sect ( int is ) {
+  if ( is>0 && is<5 ) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+int  btn_sect ( int is ) {
+  if ( 0>is && -4<is ) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+int  prog_sect ( int is ) {
+  if ( is>10 ) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+int  pleb_sect ( int is ) {
+  if ( -11==is ) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
 char member_of(char val, char* choices, char count)
 {
   char    member              = 0;

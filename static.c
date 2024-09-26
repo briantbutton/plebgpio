@@ -6,6 +6,7 @@ static char program_ix        = zero;
 static char opcode            = LOOP;
 static char overspeed         = one;
 static int  old_bits          = zero;
+static int  problem           = zero;
 
 typedef struct
 {
