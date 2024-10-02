@@ -92,7 +92,9 @@ char retrieve_program(){
   }
 }
 int transition_program(char new_program){
+#if VERBOSE == 1 || VERBOSE == 2 || VERBOSE == 3
   printf("transition_program:  new_program == %d, program == %d\n",new_program,program);
+#endif
   program                     = new_program;
   program_ix                  = 0;
   opcode                      = LOOP;
@@ -189,7 +191,9 @@ void process_button ( int read_values , bn_gpio_btn* btn ) {
       string[0]               = curr_val+ZEROTXT;
       assemble_path(fullpath,"","",fname);
       file_write ( fullpath , string , 1 );
+#if VERBOSE == 1 || VERBOSE == 2 || VERBOSE == 3
       printf("process_buttons: writing value '%c' to '%s'\n",string[0],fullpath);
+#endif
       line->val               = curr_val;
     }
   }

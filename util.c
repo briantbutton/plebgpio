@@ -34,6 +34,19 @@ int  pleb_sect ( int is ) {
     return 0;
   }
 }
+char is_octal_value ( const char* string, char limit ) {
+  char    str0;
+  if ( strlen(string)==1 ) {
+    str0                      = string[0];
+    if ( str0 < ZEROTXT+limit+1 ) {
+      return 1;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
+}
 char member_of(char val, char* choices, char count)
 {
   char    member              = 0;
@@ -91,8 +104,9 @@ char count_led_lines(bn_gpio_led* led){
       actv                    = 1;
     }
   }
-  if ( led->colrs==1 ) {
+  if ( led->colrs==0 || led->colrs==1 ) {
     if ( led->red->pin==0 && led->grn->pin==0 && led->blu->pin>0 ) {
+      led->colrs              = 1;                                // 1 is the default # of colors if the other config matches
       count_line(led->blu);
       actv                    = 1;
     }
@@ -116,6 +130,7 @@ char count_btn_lines(bn_gpio_btn* btn){
   btn->actv                   = actv;
   return actv;
 }
+#if VERBOSE == 2 || VERBOSE == 3
 void print_led_pin(bn_gpio_led* led, bn_gpio_line* pin, char* colour){
   printf("      led%d-%s is GPIO #%d, and has weight %d\n",led->num,colour,pin->pin,pin->weight);
 }
@@ -140,6 +155,7 @@ void print_btn(bn_gpio_btn* btn){
     printf("   btn%d is inactive\n",btn->num);
   }
 }
+#endif
 void print_config(){
 #if VERBOSE == 2 || VERBOSE == 3
   printf("\nconfig.curr_weight == %d, config.line_count == %d\n",config.curr_weight,config.line_count);
@@ -179,14 +195,6 @@ int pinOf(const char* string) {
   if ( pin<0 || pin>26 )
     pin                       = 0;
   return pin;
-}
-char octal_value(char* array, int offset, int assign) {
-  char    octal               = 0;
-  if ( array[offset+0] == 1 )         octal            = octal+4;
-  if ( array[offset+1] == 1 )         octal            = octal+2;
-  if ( array[offset+2] == 1 || array[offset+3] == 1 )
-    octal                     = octal+1;
-  return b36outs[octal];
 }
 void assemble_path(char *path, char *a, char *b, char *c){
   char    l                   = strlen(bngpiodir),

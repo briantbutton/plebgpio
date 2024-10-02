@@ -14,7 +14,7 @@
 #include <time.h> 
 
 
-#define VERBOSE                     2
+#define VERBOSE                     1
 #define WHYT                        7
 #define YELW                        6
 #define MGNT                        5
@@ -94,7 +94,7 @@
                   $ sudo setcap "cap_fowner,cap_chown+ep" /sbin/gpio
 
 
-  /etc/bn/gpio/
+  /etc/plebgpio/
             ~ led0/
             ~ led1/
             ~ led2/
@@ -108,7 +108,7 @@
 
 
 // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
-//  INITIALIZE                       INITIALIZE                        INITIALIZE
+//  NOT USED                         NOT USED                          NOT USED
 void doze_briefly(){
   struct  timespec remaining, request = { 0, 62500000 }; 
   int     slept               = nanosleep(&request, &remaining);
@@ -123,7 +123,7 @@ void doze_briefly(){
   }
 #endif
 }
-//  INITIALIZE                       INITIALIZE                        INITIALIZE
+//  NOT USED                         NOT USED                          NOT USED
 // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
 
 
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
           failed_program      = 0;
   int     i                   = -1,
           j                   = -1,
-          cycles              = 10000,
+          cycles              = 30000,
           gearing             = 12,read_mask,write_mask;
   struct  timespec ts         = { .tv_sec = 0 }, 
                    tr         = { .tv_sec = 0 };
@@ -205,7 +205,6 @@ int main(int argc, char **argv) {
         }
         failed_read           = read_and_process_buttons ( &pins , read_mask ) ;
         new_program           = retrieve_program();
-        // printf("main:  new_program == %d, program == %d\n",new_program,program);
         if( new_program!=program && new_program>0 ){
           failed_program      = 0;
           next_opcode         = transition_program(new_program);
