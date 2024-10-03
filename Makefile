@@ -1,13 +1,15 @@
-all: gpio
+all: plebgpio
 
 LINK=-Wall -Wno-char-subscripts 
 CC=gcc
 
-gpio: gpio.c
+plebgpio: plebgpio.c
 	$(CC) $(LINK) $^ -lm -o $@ 
 
 clean:
-	rm gpio
+	rm plebgpio
 	
 install:
-	chmod 777 brltty
+	sudo mv plebgpio /bin
+	sudo chown root:service /bin/plebgpio
+	sudo chmod 4755 /bin/plebgpio

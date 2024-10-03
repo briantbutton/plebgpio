@@ -27,12 +27,12 @@
 #define LOOP                        3
 #define STOP                        4
 #define NO_PROBLEM                  0
-#define MISSING_DIR                 1
-#define CONFIG_PARSE_ERROR          2
-#define CHIP_OPEN_ERROR             3
-#define BAD_OPCODE                 12
-#define FAILED_GPIO_WRITE          13
-#define FAILED_GPIO_READ           14
+#define MISSING_DIR                91
+#define CONFIG_PARSE_ERROR         92
+#define CHIP_OPEN_ERROR            93
+#define BAD_OPCODE                 94
+#define FAILED_GPIO_WRITE          95
+#define FAILED_GPIO_READ           96
 #define MAX_PATH                   60
 #define PROGRAM_LENGTH             80
 #define ZEROTXT                    48                  // '0'
@@ -65,7 +65,9 @@
 #define eight                       8
 #define GPIOCHIP     "/dev/gpiochip0"
 #define INFOCOLS                   3u
-#define INPUTTIMEOUT              100                // poll input timeout (ms)
+#define INPUTTIMEOUT              100                  // poll input timeout (ms)
+#define CHAR_ERROR                126                  // '~'
+#define VAL_ERROR                  36                  // Signals base36 (or base16) conversion failed
 
 
 #include "static.c"
@@ -82,9 +84,9 @@
   $ gcc -Wall -Wno-char-subscripts gpio.c -Wno-unused-but-set-variable -Wno-unused-variable -o gpio
 
   EMPOWER
-  $ sudo mv gpio /bin
-  $ sudo chown root:service /sbin/gpio
-  $ sudo chmod 4755 /sbin/gpio
+  $ sudo mv plebgpio /bin
+  $ sudo chown root:service /bin/plebgpio
+  $ sudo chmod 4755 /bin/plebgpio
 
   $ sudo cat /sys/kernel/debug/gpio
 
@@ -131,19 +133,18 @@ int main(int argc, char **argv) {
   unsigned delayns            = 125000000;
   char    new_program         = initialize_config(argc,argv),
           next_opcode         = LOOP,
-          failed_read         = 0,
-          failed_write        = 0,
-          failed_program      = 0;
+          failed              = 0,
+          bad_program         = 0;
   int     i                   = -1,
           j                   = -1,
           cycles              = 30000,
-          gearing             = 12,read_mask,write_mask;
+          gearing             = 11,read_mask;     // ,write_mask;
   struct  timespec ts         = { .tv_sec = 0 }, 
                    tr         = { .tv_sec = 0 };
   ts.tv_nsec                  = delayns / overspeed;
 
   read_mask                   = config.read_mask;
-  write_mask                  = config.write_mask;
+  // write_mask                  = config.write_mask;
 
   // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
   //   SETUP GPIO                       SETUP GPIO                       SETUP GPIO
@@ -151,6 +152,7 @@ int main(int argc, char **argv) {
   if ( !problem )
     if ( ( chip_fd = gpio_dev_open (GPIOCHIP) ) < 0)
       problem                 = CHIP_OPEN_ERROR;
+
   if ( !problem ) {
 
     struct gpio_v2_line_attribute rd_attr            = { .id = 1 };
@@ -168,8 +170,7 @@ int main(int argc, char **argv) {
     gpio_v2_t pins            = { .linecfg = &linecfg, .linereq = &linereq, .linevals= &linevals };
     pins.fd                   = chip_fd;
 
-    while ( config.line_count-1>j++ )
-      pins.linereq->offsets[j]= config.offsets[j]->pin;
+    while ( config.line_count-1>j++ )                  pins.linereq->offsets[j]= config.offsets[j]->pin;
 
 #if VERBOSE == 3
     printf("\nread_mask == %d, write_mask == %d, weight == %d, line_limit == %d\n",read_mask,write_mask,config.curr_weight,config.line_count-1);
@@ -195,24 +196,32 @@ int main(int argc, char **argv) {
 #endif
 
     next_opcode               = transition_program(new_program);
-    while ( failed_read==0 && failed_write==0 && cycles>i++ ) {
+    while ( !failed && cycles>i++ ) {
       j                       = -1;
-      while ( failed_read==0 && failed_write==0 && gearing>j++ ) {
-        if ( failed_program!=1 && ( next_opcode!=STOP || program_ix!=0 ) && ( ( j % overspeed ) == 0 ) ) {
-          next_opcode         = step_program ( &pins , write_mask ) ;
-          if ( next_opcode==FAILED_GPIO_WRITE )      failed_write        = 1;
-          if ( next_opcode==BAD_OPCODE )             failed_program      = 1;
+      while ( !failed && gearing>j++ ) {
+        if ( !bad_program  && (j%overspeed)==0 ) {
+          if ( program==0 ) {
+            set_leds ( &pins ) ;
+          } else {
+            if ( next_opcode!=STOP || program_ix!=0 ) {
+              next_opcode     = step_program ( &pins ) ;
+              if ( problem!=NO_PROBLEM )               failed              = 1;
+              if ( next_opcode==BAD_OPCODE )           bad_program         = 1;
+            }
+          }
         }
-        failed_read           = read_and_process_buttons ( &pins , read_mask ) ;
-        new_program           = retrieve_program();
-        if( new_program!=program && new_program>0 ){
-          failed_program      = 0;
-          next_opcode         = transition_program(new_program);
+        if ( !failed ) {
+          failed              = read_and_process_buttons ( &pins ) ;
+          new_program         = retrieve_program();
+          if( new_program!=VAL_ERROR && new_program!=program ){
+            bad_program       = 0;
+            next_opcode       = transition_program(new_program);
+          }
+          nanosleep (&ts, &tr);
         }
-        nanosleep (&ts, &tr);
       }
     }
-    usleep (INPUTTIMEOUT * 1000);     /* delay input timeout microsecs */
+    usleep (INPUTTIMEOUT * 1000);               // delay input timeout microsecs 
     gpio_dev_close (chip_fd);
   }
   return problem;

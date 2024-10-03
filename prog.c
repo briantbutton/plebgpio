@@ -78,15 +78,29 @@ void update_prog ( int prog_num , int offset , const char* values ) {
 }
 char recognized_program(char prog){
   char    result              = 0;
-  if( prog==1 || prog==2 || prog==3 || prog==4 || prog==5 || prog==6 || prog==7 || prog==8 || prog==9 ){
+  if ( prog==0  || prog==1  || prog==2  || prog==3  || prog==4  || prog==5  || prog==6  || prog==7  || prog==8  || prog==9  || prog==10 || prog==11 || prog==12 || prog==13 || prog==14 || prog==15 )
     result                    = 1;
-  }
+  return result;
+}
+char recognized_color(char prog){
+  char    result              = 0;
+  if ( prog==0  || prog==1  || prog==2  || prog==3  || prog==4  || prog==5  || prog==6  || prog==7 )
+    result                    = 1;
   return result;
 }
 char retrieve_program(){
   char    prog                = read_file_digit("","","prog");
-  if ( recognized_program(prog)==1 ) {
+  if ( recognized_program(prog) ) {
     return prog;
+  } else {
+    return VAL_ERROR;
+  }
+}
+char retrieve_led(char led_num){
+  char    label[5]            = { 108 , 101 , 100 , led_num+ZEROTXT , 0 },
+          colr                = read_file_digit("","",label);
+  if ( recognized_color(colr) ) {
+    return colr;
   } else {
     return 0;
   }
@@ -100,7 +114,7 @@ int transition_program(char new_program){
   opcode                      = LOOP;
   return opcode;
 }
-char led_mod ( bn_gpio_led *led ) {
+char ledmod ( bn_gpio_led *led ) {
   char    wid                 = led->colrs,mod;
   if ( led->actv!=1 )
     wid                       = 0;
@@ -110,14 +124,16 @@ char led_mod ( bn_gpio_led *led ) {
 // WARNING                                                        WARNING
 // char is not a good type if there are more than 7 LED pins in total
 // WARNING                                                        WARNING
-int step_program(gpio_v2_t *pins, int write_mask){
+int step_program(gpio_v2_t *pins){
+  int     write_mask          = config.write_mask;
   char    prog                = program*5,
           prog_led            = prog+1,
-          first_led_val,second_led_val,third_led_val,fourth_led_val,
-          first_led_mod,second_led_mod,third_led_mod,fourth_led_mod,
-          first_led_xer,second_led_xer,third_led_xer,fourth_led_xer,
-          first_led_net,second_led_net,third_led_net,fourth_led_net;
-  int     bits                = 0;
+          led_xer             = 1,
+          led_mod             = 1,
+          led_val             = 0;
+  char    led_net[4]          = { 0 , 0 , 0 , 0 };
+  int     bits                = 0,
+          i                   = -1;
 
   // printf("step_program, prog == %d, program == %d, prog_led == %d\n",prog,program,prog_led);
 
@@ -132,46 +148,54 @@ int step_program(gpio_v2_t *pins, int write_mask){
     }
   }
 
-  if( opcode==CNTNU && write_mask>0 ){
+  if ( opcode==CNTNU && write_mask>0 ) {
     opcode                    = progs[prog][program_ix];
     if ( opcode==CNTNU || opcode==LOOP || opcode==STOP ) {
 
-      first_led_val           = progs[prog_led+0][program_ix];
-      first_led_mod           = led_mod(config.led0);
-      first_led_xer           = 1;
-      first_led_net           = ( first_led_val % first_led_mod ) * first_led_xer;
-
-      second_led_val          = progs[prog_led+1][program_ix];
-      second_led_mod          = led_mod(config.led1);
-      second_led_xer          = first_led_xer * first_led_mod;
-      second_led_net          = ( second_led_val % second_led_mod ) * second_led_xer;
-
-      third_led_val           = progs[prog_led+2][program_ix];
-      third_led_mod           = led_mod(config.led2);
-      third_led_xer           = second_led_xer * second_led_mod;
-      third_led_net           = ( third_led_val % third_led_mod ) * third_led_xer;
-
-      fourth_led_val          = progs[prog_led+3][program_ix];
-      fourth_led_mod          = led_mod(config.led3);
-      fourth_led_xer          = third_led_xer * third_led_mod;
-      fourth_led_net          = ( fourth_led_val % fourth_led_mod ) * fourth_led_xer;
-
-      bits                    = first_led_net + second_led_net + third_led_net + fourth_led_net;
-
-      if ( gpio_line_set_values ( pins , bits, write_mask) == -1 ) {
-        return FAILED_GPIO_WRITE;
-      } else {
-        return opcode;
+      while ( 3 > i++ ) {
+        led_val               = progs[prog_led+i][program_ix];
+        led_xer               = led_xer * led_mod;
+        led_mod               = ledmod(leds[i]);
+        led_net[i]            = ( led_val % led_mod ) * led_xer;
       }
+      bits                    = led_net[0] + led_net[1] + led_net[2] + led_net[3];
+
+      if ( old_led_bits!=bits ) {
+        old_led_bits          = bits;
+        if ( gpio_line_set_values ( pins , bits, write_mask) < 0 ) 
+          problem             = FAILED_GPIO_WRITE;
+      }
+      return opcode;
     } else {
       return BAD_OPCODE;
     }
   } else {
     return opcode;
   }
-    // if (gpio_line_set_values (&pins, 0x0009, read_mask-1) == -1)  {
-    //   break;
-    // }
+}
+void set_leds(gpio_v2_t *pins){
+  int     write_mask          = config.write_mask;
+  char    led_xer             = 1,
+          led_mod             = 1,
+          led_val             = 0;
+  char    led_net[4]          = { 0 , 0 , 0 , 0 };
+  int     bits                = 0,
+          i                   = -1;
+
+  // printf("step_program, prog == %d, program == %d, prog_led == %d\n",prog,program,prog_led);
+
+  while ( 3 > i++ ) {
+    led_val                   = retrieve_led(i);
+    led_xer                   = led_xer * led_mod;
+    led_mod                   = ledmod(leds[i]);
+    led_net[i]                = ( led_val % led_mod ) * led_xer;
+  }
+  bits                        = led_net[0] + led_net[1] + led_net[2] + led_net[3];
+  if ( old_led_bits!=bits ) {
+    old_led_bits              = bits;
+    if ( gpio_line_set_values ( pins , bits, write_mask) < 0 ) 
+      problem                 = FAILED_GPIO_WRITE;
+  }
 }
 void process_button ( int read_values , bn_gpio_btn* btn ) {
   char    string[4]           = {  32 ,  32 ,  32 ,   0 };
@@ -204,12 +228,14 @@ void process_buttons ( int read_values ) {
   process_button ( read_values , config.btn2 ) ;
 }
 
-int read_and_process_buttons ( gpio_v2_t *pins , int read_mask ) {
-  int     failed_read         = 0,read_values;
+int read_and_process_buttons ( gpio_v2_t *pins ) {
+  int     read_mask           = config.read_mask,
+          failed_read         = 0,read_values;
   if ( read_mask>0 ) {
     read_values               = gpio_line_get_values ( pins , read_mask , read_mask ) ;
     if ( read_values<0 ) {
       failed_read             = 1;
+      problem                 = FAILED_GPIO_READ;
     } else {
       process_buttons(read_values);
     }

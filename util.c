@@ -106,7 +106,7 @@ char count_led_lines(bn_gpio_led* led){
   }
   if ( led->colrs==0 || led->colrs==1 ) {
     if ( led->red->pin==0 && led->grn->pin==0 && led->blu->pin>0 ) {
-      led->colrs              = 1;                                // 1 is the default # of colors if the other config matches
+      led->colrs              = 1;                                  // 1 is the default # of colors if the other config matches
       count_line(led->blu);
       actv                    = 1;
     }

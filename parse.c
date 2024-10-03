@@ -101,7 +101,7 @@ int handler(void* conf, const char* sect, const char* name, const char* valu){
         printf("handler: step set to %s\n",valu);
 #endif
       }
-      if ( strcmp("prog",name)==0 && is_octal_value(valu,7)==1 ) {
+      if ( strcmp("prog",name)==0 && is_octal_value(valu,9)==1 ) {
         program               = valu[0] - ZEROTXT;
 #if VERBOSE == 3
         printf("handler: program set to %s\n",valu);
@@ -118,7 +118,7 @@ int handler(void* conf, const char* sect, const char* name, const char* valu){
 int initialize_config(int argc, char** argv){
   int     parse_result        = -1;;
   char    fullpath[MAX_PATH];
-  char    string[4]           = {  32 ,  32 ,  32 ,   0 };
+  char    string[4]           = {  32 ,  32 ,   0 };
 
   setlinebuf(stdout);
 
@@ -128,6 +128,7 @@ int initialize_config(int argc, char** argv){
 
     assemble_path ( fullpath , "" , "" , "config.txt" ) ;
     parse_result              = ini_parse ( fullpath ,handler , &config ) ;
+
 #if VERBOSE == 3
     printf("result from ini_parse == %d\n",parse_result);
 #endif
@@ -135,11 +136,9 @@ int initialize_config(int argc, char** argv){
     printf("initial program == %d\n",program);
 #endif
 
-    if ( program > 0 ) {
-      string[0]               = program + ZEROTXT;
-      assemble_path ( fullpath , "" , "" , "prog" ) ;
-      file_write ( fullpath , string , 1 );
-    }
+    string[0]                 = program + ZEROTXT;
+    assemble_path ( fullpath , "" , "" , "prog" ) ;
+    file_write ( fullpath , string , 1 );
   }
   if ( parse_result==0 ) {
     count_lines();
@@ -149,7 +148,7 @@ int initialize_config(int argc, char** argv){
     if ( bngpiodir_ok ) {
       problem                 = CONFIG_PARSE_ERROR;
     } else {
-      return problem          = MISSING_DIR;
+      problem                 = MISSING_DIR;
     }
     return 0;
   }

@@ -189,8 +189,8 @@ int gpio_line_get_values (gpio_v2_t *gpio, __u64 bits,  __u64 mask) {
     perror ("ioctl-GPIO_V2_LINE_GET_VALUES_IOCTL-1");
     return -1;
   }
-  bits   = gpio->linevals->bits;
-  if ( bits!=old_bits ) {
+  bits  = gpio->linevals->bits;
+  if ( bits!=old_btn_bits ) {
 #if VERBOSE == 3
     if ( ( bits & bits ) > 0 ){
       printf("'bits' is non-zero   %d\n",bits);
@@ -198,9 +198,9 @@ int gpio_line_get_values (gpio_v2_t *gpio, __u64 bits,  __u64 mask) {
       printf("'bits' is zero   %d\n",bits);
     }
 #endif
-    old_bits = bits;
+    old_btn_bits = bits;
   }
-  return old_bits;
+  return old_btn_bits;
 }
 
 

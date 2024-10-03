@@ -3,7 +3,7 @@
 **plebgpio** provides a high level API for GPIO operation of LEDs and buttons.&nbsp; 
 It is configured using a simple config file using *"standard"* conventions.&nbsp; 
 Control and telemetry passes through another handful of files.&nbsp; 
-The config file and other files live in the "pleb" directory (`/etc/plebgpio`).&nbsp; 
+The config file and other files live in the "pleb" directory (`/etc/pleb/gpio`).&nbsp; 
 
 ### Highlights
 
@@ -39,7 +39,7 @@ Here is what it looks like using Bash script.
 
 ### Basic Configuration
 
-The configuration file (`/etc/plebgpio/config.txt`) allows one specify some LEDs and buttons.&nbsp; 
+The configuration file (`/etc/pleb/gpio/config.txt`) allows one specify some LEDs and buttons.&nbsp; 
 Once specified, they can be controlled/monitored by using their filename, as you see above.&nbsp; 
 Since ground pins are not specified, the entry for a button is gonna be a one line configuration.&nbsp; 
 
@@ -57,7 +57,7 @@ A single color LED will likewise be one configuration line.&nbsp;
 
 Whoops!&nbsp; 
 That was easy.&nbsp; 
-Those lines configure a button, labeled `btn0`, using a ground pin and GPIO #17, and also an LED, labeled `led1`, using a ground pin and #GPIO #25.&nbsp; 
+Those lines configure a button, labeled `btn0`, using a ground pin and GPIO #17, and also an LED, labeled `led1`, using a ground pin and GPIO #25.&nbsp; 
 
 ### Basic Operation
 
@@ -73,14 +73,14 @@ The operation below will show a '1' or a '0'.&nbsp;
 	$ cat /etc/pleb-gpio/btn0                   # see whether BTN0 is depressed
 
 If you want your software to monitor `btn0`, you will want to poll this file.&nbsp;
-Every 250ms should be plenty.&nbsp; 
+Our poll rate is 250ms.&nbsp; 
 
 ## Advanced Operation &mdash; Colors
 
 ### Color Configuration
 
 **plebgpio** supports multi-color _Common Cathode_ LEDs.&nbsp; 
-To configure that, we start by adding a `colors=` line to the config file.&nbsp;
+To set multiple colors, we add a `colors=` line to the config file.&nbsp;
 Also, we no longer specify `pwr=` but specify the color of each pin.&nbsp; 
 See this example.&nbsp; 
 
@@ -92,30 +92,43 @@ See this example.&nbsp;
 
 ### Color Operation
 
-With color operation, one may now poke an octal code into your LED file.&nbsp; 
+While monochrome LEDs work with a binary code (0 or 1), multi-color LEDs take an octal code (0 through 7).&nbsp; 
 The coding is rgb; red == 4, green == 2 and blue == 1.&nbsp;
 Now, we do it this way:&nbsp; 
 
-	$ echo 5 > /etc/pleb-gpio/led5              # magenta in LED2
+	$ echo 5 > /etc/pleb-gpio/led2              # magenta in LED2
 
 ## Advanced Operation &mdash; Programs
 
 ### Program Configuration
 
-**plebgpio** supports multi-color _Common Cathode_ LEDs.&nbsp; 
-To configure that, we start by adding a `colors=` line to the config file.&nbsp;
-Also, we no longer specify `pwr=` but specify the color of each pin.&nbsp; 
-See this example.&nbsp; 
+We frequently signal information with time-related behavior &mdash; like a fast blink or a slow blink.&nbsp; 
+This can be done, using **programs**.&nbsp; 
+A program is a time-series of display, probably running in a loop.&nbsp; 
+Let's look at one.
 
-	[led2]
-	colors=3
-	red=11
-	green=9
-	blue=10
+	[prog6]
+	next=-----------------------<
+	led1=ggooggoooooooooooooooooo
+
+Program 6 blinks green twice.&nbsp;
+Forever.&nbsp; 
+
+Each period of the program is one eighth of a second, 125ms.&nbsp; 
+The top row, `next=` describes what happens next &mdash; `-` means "continue" `<` means "loop from the start", and `x` means stop.&nbsp; 
+The second row, `led1=` assigns an octal value to LED1 for that period.&nbsp; 
+
+In a program, we use letters for the octal codes:&nbsp;  
+&nbsp;&nbsp;~&nbsp;o: 0&nbsp; _(off)_&nbsp;  
+&nbsp;&nbsp;~&nbsp;g: 1&nbsp; _(green)_&nbsp;  
+&nbsp;&nbsp;~&nbsp;b: 2&nbsp; _(blue)_&nbsp;  
+&nbsp;&nbsp;~&nbsp;c: 3&nbsp; _(cyan)_&nbsp;  
+
+
 
 ### Program Operation
 
-With color operation, one may now poke an octal code into your LED file.&nbsp; 
+While monochrome LEDs work with a binary code (0 or 1), multi-color LEDs take an octal code .&nbsp; 
 The coding is rgb; red == 4, green == 2 and blue == 1.&nbsp;
 Now, we do it this way:&nbsp; 
 
