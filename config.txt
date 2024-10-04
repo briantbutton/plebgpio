@@ -28,6 +28,7 @@ led1=rrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbb
 led2=rrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbb
 
 [prog2]
+next=-----------------------------------------------------------------------<
 led1=rrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbb
 led2=ccccmmmmyyyyccccmmmmyyyyccccmmmmyyyyccccmmmmyyyyccccmmmmyyyyccccmmmmyyyy 
 
