@@ -1,0 +1,15 @@
+[Unit]
+Description=Pleb GPIO
+Documentation=https://github.com/briantbutton/pleb-gpio
+After=network.target
+
+; User need NOT be root but should be in the 'dialout' group
+; https://forums.raspberrypi.com/viewtopic.php?t=340199
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/plebgpio
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

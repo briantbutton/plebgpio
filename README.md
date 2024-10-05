@@ -1,17 +1,16 @@
 # plebgpio
 
 **plebgpio** provides a high level API for GPIO operation of LEDs and buttons.&nbsp; 
-It is configured using a simple config file using *"standard"* conventions.&nbsp; 
+It is configured with a simple config file using *"standard"* conventions.&nbsp; 
 Control and telemetry passes through another handful of files.&nbsp; 
 The config file and other files live in the "pleb" directory (`/etc/pleb/gpio/`).&nbsp; 
 
 ### Highlights
 
 &#9679; Easy to set up &mdash; even easier to operate&nbsp;  
-&#9679; Negligible usage of system resources (memory and cpu)&nbsp;  
+&#9679; Negligible usage of system resources _(memory and cpu)_&nbsp;  
 &#9679; Accessible by any language running on Linux&nbsp;  
-&#9679; Uses *(in 2024)* the very latest GPIO kernel API&nbsp;  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*(see fine print on these highlights below)*&nbsp; 
+&#9679; Uses the very latest GPIO kernel API&nbsp;  
 
 ## Raison d'être &nbsp; 
 
@@ -126,13 +125,16 @@ The top row, `next=` describes what happens next &mdash; `-` means "continue" `<
 The second row, `led1=` assigns an octal value to LED1 for that period.&nbsp; 
 Program 6 above illuminates LED1 green for 250ms, then off for 250ms then green again.&nbsp; 
 
-In a program, we use letters for the octal codes:&nbsp;  
-&nbsp;&nbsp;&bull;&nbsp;o: 0&nbsp; _(off)_&nbsp;  
-&nbsp;&nbsp;&bull;&nbsp;g: 1&nbsp; _(green)_&nbsp;  
-&nbsp;&nbsp;&bull;&nbsp;b: 2&nbsp; _(blue)_&nbsp;  
-&nbsp;&nbsp;&bull;&nbsp;c: 3&nbsp; _(cyan)_&nbsp;  
-&nbsp;&nbsp;&bull;&nbsp;r: 4&nbsp; _(red)_&nbsp;  
-&nbsp;&nbsp;&bull;&nbsp;m: 5&nbsp; _(magenta)_&nbsp;  
+In a program, _(and ONLY in a program)_ we use letters for the octal (or binary) codes:&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`o` 0&nbsp;&nbsp; _(off)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`p` 1&nbsp;&nbsp; _(pwr)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`b` 1&nbsp;&nbsp; _(blue)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`g` 2&nbsp;&nbsp; _(green)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`c` 3&nbsp;&nbsp; _(cyan)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`r` 4&nbsp;&nbsp; _(red)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`m` 5&nbsp;&nbsp; _(magenta)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`y` 6&nbsp;&nbsp; _(yellow)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`w` 7&nbsp;&nbsp; _(white)_&nbsp;  
 
 A program can be up to 80 segments _(10 seconds)_ long before it repeats or stops.&nbsp; 
 It may specify multiple LEDs which will display in lock step.&nbsp; 
@@ -159,49 +161,55 @@ When the system starts, it will be running program 0, unless otherwise configure
 It loops, monitoring and filling the files described above.&nbsp; 
 The normal interval is 125ms but it can be set for 62.5ms.&nbsp; 
 
-Ideally **plebgpio** is launched by SystemD and is a quite tool to provide a simplified interface for GPIO.&nbsp; 
+Ideally **plebgpio** is launched by SystemD and is a quietly provides a simplified interface for GPIO.&nbsp; 
 
+### Installation
 
+There is no installation program for **plebgpio** yet but the steps should be easy for people comfortable with the craft.&nbsp; 
+The installing user must have root privilege.&nbsp; 
+The `Makefile` describes how to compile and install the **plebgpio** program.&nbsp; 
+There is a sample systemd service file that should get you going.&nbsp; 
+Short of making it a systemd process, one can invoke **plebgpio** in background by calling.&nbsp;  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$&nbsp;plebgpio &amp;&nbsp; 
 
-If you are reading this, **STOP**.&nbsp; 
-The text below is detritus from editing efforts.
+**WAIT!**&nbsp;&nbsp; 
+Stop.&nbsp; 
+Before invoking it, you should create the **pleb** directory.&nbsp; 
+_(As noted, there is no installation program.)_&nbsp; 
+Soooo . . .&nbsp; 
 
+	  $ sudo mkdir /etc/pleb
+	  $ sudo mkdir /etc/pleb/gpio
+	  $ sudo chown root:dialout /etc/pleb/gpio
+	  $ sudo chmod 2770 /etc/pleb/gpio
 
+And you probably want to put an item or two in config.txt.&nbsp; 
+Here is a comprehensive list of the available sections:&nbsp; 
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**pleb** &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**led0** &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**led1** &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**led2** &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**led3** &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**btn0** &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**btn1** &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**btn2** &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**prog1** &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**prog2** &nbsp;   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9679;&nbsp;  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9679;&nbsp;  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9679;&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;**prog9** &nbsp;  
 
-
-Specifying a button is similar.&nbsp; 
-
-	[btn0]
-	hot=17
-
-_(Note that ground pins are never specified.)_&nbsp; 
-
-When **plebgpio** starts up, it will read `config.txt`, and behave accordingly.&nbsp; 
-
-### Operate
-
-Operation is done through reading and writing single characters in named files in the **pleb** directory.&nbsp; 
-
-Readable files include:&nbsp;  
-&#9679; **btn0** &nbsp;  
-&#9679; **btn1** &nbsp;  
-&#9679; **btn2** &nbsp;  
-
-Writable files include:&nbsp;  
-&#9679; **led0** &nbsp;  
-&#9679; **led1** &nbsp;  
-&#9679; **led2** &nbsp;  
-&#9679; **led3** &nbsp;  
-&#9679; **prog** &nbsp;  
-
-_(Programs are an advanced way to display LED behavior, see below.)_&nbsp; 
-
-## Installation
-
-(coming back here)
-
+ :warning: Be careful.&nbsp; 
+ An improper `config.txt` will stop everything and error reporting is negligible right now.&nbsp; 
 
 ## Acknowlegements
+
+Someone going by **drankinatty** in the [Raspberry Pi Forums](https://forums.raspberrypi.com/viewtopic.php?p=2218500) wrote the V2 functions that are being used here.&nbsp; 
+Thanks **drankinatty** wherever you are.&nbsp; 
+
+The config file parser uses the simple but effective code we found [here](https://github.com/benhoyt/inih).&nbsp; 
+We just popped it in, it compiled and worked!&nbsp; 
 
 
 
