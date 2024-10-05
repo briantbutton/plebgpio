@@ -22,12 +22,12 @@ Our searches did not reveal much, and most of that was discontinued.&nbsp;
 
 ### Current
 
-**plebgpio** is based on the V2 ioctl interface ( aka GPIO Character Device Userspace API &mdash; https://www.kernel.org/doc/html/latest/userspace-api/gpio/chardev.html ).&nbsp; 
+**plebgpio** is based on the V2 ioctl interface (aka [GPIO Character Device Userspace API](https://www.kernel.org/doc/html/latest/userspace-api/gpio/chardev.html)).&nbsp; 
 This is hot off the presses and, God willing, will be with us for a very long time.&nbsp; 
 
 ### Easy and versatile
 
-The concept is simple; writing to a file writes a value to the LED that file maps to.&nbsp; 
+The concept is simple:&nbsp; writing to a file seta a value for the LED that file represents.&nbsp; 
 Reading a button&apos;s value is done by reading from the file representing that button.&nbsp; 
 
 	$ echo 0 > /etc/pleb-gpio/led1            # turn off LED1
