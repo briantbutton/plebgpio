@@ -44,7 +44,7 @@ Here is what it looks like using Bash script.
 ### Basic Configuration
 
 The configuration file (`/etc/pleb/gpio/config.txt`) allows one to specify some LEDs and buttons.&nbsp; 
-Once specified, they can be controlled/monitored by using their filename, as you see above.&nbsp; 
+Once specified, they can be controlled/monitored by using their filename.&nbsp; 
 Since ground pins are not specified, the entry for a button is a two line configuration &mdash; label the button and name the non-ground pin.&nbsp; 
 
 	[btn0]
@@ -69,12 +69,12 @@ Turning on the LED1 is now a matter of writing into its file.&nbsp;
 A '1' for on and a '0' for off.&nbsp; 
 Done like this:&nbsp; 
 
-	$ echo 1 > /etc/pleb-gpio/led1            # turn on LED1
+	$ echo 1 > /etc/pleb/gpio/led1            # turn on LED1
 
 Buttons work the same, but you read the file, instead of writing.&nbsp; 
 The operation below will return a '1' or a '0'.&nbsp; 
 
-	$ cat /etc/pleb-gpio/btn0                 # see whether BTN0 is depressed
+	$ cat /etc/pleb/gpio/btn0                 # see whether BTN0 is depressed
 
 If you want your software to monitor `btn0`, you will want to poll this file.&nbsp;
 Our poll rate is 250ms.&nbsp; 
@@ -126,15 +126,15 @@ The second row, `led1=` assigns an octal value to LED1 for that period.&nbsp;
 Program 6 above illuminates LED1 green for 250ms, then off for 250ms then green again.&nbsp; 
 
 In a program, _(and ONLY in a program)_ we use letters for the octal (or binary) codes:&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`o` 0&nbsp;&nbsp; _(off)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`p` 1&nbsp;&nbsp; _(pwr)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`b` 1&nbsp;&nbsp; _(blue)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`g` 2&nbsp;&nbsp; _(green)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`c` 3&nbsp;&nbsp; _(cyan)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`r` 4&nbsp;&nbsp; _(red)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`m` 5&nbsp;&nbsp; _(magenta)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`y` 6&nbsp;&nbsp; _(yellow)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`w` 7&nbsp;&nbsp; _(white)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`o`&nbsp;&nbsp; 0&nbsp;&nbsp; _(off)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`p`&nbsp;&nbsp; 1&nbsp;&nbsp; _(pwr)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`b`&nbsp;&nbsp; 1&nbsp;&nbsp; _(blue)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`g`&nbsp;&nbsp; 2&nbsp;&nbsp; _(green)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`c`&nbsp;&nbsp; 3&nbsp;&nbsp; _(cyan)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`r`&nbsp;&nbsp; 4&nbsp;&nbsp; _(red)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`m`&nbsp;&nbsp; 5&nbsp;&nbsp; _(magenta)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`y`&nbsp;&nbsp; 6&nbsp;&nbsp; _(yellow)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`w`&nbsp;&nbsp; 7&nbsp;&nbsp; _(white)_&nbsp;  
 
 A program can be up to 80 segments _(10 seconds)_ long before it repeats or stops.&nbsp; 
 It may specify multiple LEDs which will display in lock step.&nbsp; 
@@ -184,20 +184,20 @@ Soooo . . .&nbsp;
 	  $ sudo chmod 2770 /etc/pleb/gpio
 
 And you probably want to put an item or two in config.txt.&nbsp; 
-Here is a comprehensive list of the available sections:&nbsp; 
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;**pleb** &nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;**led0** &nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;**led1** &nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;**led2** &nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;**led3** &nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;**btn0** &nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;**btn1** &nbsp;  
+Here is a comprehensive list of the available sections:&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;pleb &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;led0 &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;led1 &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;led2 &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;led3 &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;btn0 &nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;btn1 &nbsp;  
 &nbsp;&nbsp;&nbsp;&bull;&nbsp;**btn2** &nbsp;  
 &nbsp;&nbsp;&nbsp;&bull;&nbsp;**prog1** &nbsp;  
 &nbsp;&nbsp;&nbsp;&bull;&nbsp;**prog2** &nbsp;   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9679;&nbsp;  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9679;&nbsp;  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9679;&nbsp;  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;  
 &nbsp;&nbsp;&nbsp;&bull;&nbsp;**prog9** &nbsp;  
 
  :warning: Be careful.&nbsp; 
