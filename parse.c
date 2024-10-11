@@ -26,10 +26,10 @@ int is_device_string ( const char* string ) {
     } else {
       str4                    = string[4];
       // progx, where x is 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E or F
-      if ( ( str4>ONETXT-1 && str4<NINETXT+1 ) || ( str4>64 && str4<71 ) || ( str4>96 && str4<103 ) ) {
-        if ( str4>64 && str4<71 )
+      if ( ( str4>ONETXT-1 && str4<NINETXT+1 ) || ( str4>64 && str4<75 ) || ( str4>96 && str4<107 ) ) {
+        if ( str4>64 && str4<75 )
           str4                = str4 - 7;
-        if ( str4>96 && str4<103 )
+        if ( str4>96 && str4<107 )
           str4                = str4 - 39;
         if ( str0==112 && str1==114 && str2==111 && str3==103 )
           is                  = 10 + str4 - ZEROTXT;
@@ -46,7 +46,7 @@ int handler(void* conf, const char* sect, const char* name, const char* valu){
   // bn_gpio_config* config      = (bn_gpio_config*)conf;
   bn_gpio_led* led;
   bn_gpio_btn* btn;
-  char    nam0                = name[0];
+  char    nam0                = name[0],val;
   int     is                  = is_device_string(sect),prog_num;
 #if VERBOSE == 3
   printf("handler: sect == '%s', name == '%s', valu == '%s'\n",sect,name,valu);
@@ -60,8 +60,9 @@ int handler(void* conf, const char* sect, const char* name, const char* valu){
       led                     = leds[is-1];
       if( strcmp("colors",name)==0 || strcmp("pwr",name)==0 || strcmp("red",name)==0 || strcmp("green",name)==0 || strcmp("blue",name)==0 ) {
         if( nam0==99 ) {
-          if ( strlen(valu)==1 && is_octal_value(valu,3)==1 )
-            led->colrs        = valu[0] - ZEROTXT;
+          val                 = b36_text_value_plus_1(valu,3,1);
+          if ( strlen(valu)==1 && val!=0 )
+            led->colrs        = val - 1;
         } else {
           if ( nam0==112 )                   led->blu->pin    = pinOf(valu);                      // pwr
           if ( nam0==114 )                   led->red->pin    = pinOf(valu);                      // red
@@ -95,19 +96,24 @@ int handler(void* conf, const char* sect, const char* name, const char* valu){
 
     // PLEB                                     PLEB                                     PLEB
     if ( pleb_sect(is) ) {
-      if ( strcmp("step",name)==0 && is_octal_value(valu,1)==1 ) {
-        overspeed             = valu[0] - ZEROTXT;
+      if ( strcmp("step",name)==0 ) {
+        val                   = b36_text_value_plus_1(valu,2,0);
+        if( val!=0 ) {
+          overspeed           = val-1;
 #if VERBOSE == 3
-        printf("handler: step set to %s\n",valu);
+          printf("handler: step set to %d\n",overspeed);
 #endif
+        }
       }
-      if ( strcmp("prog",name)==0 && is_octal_value(valu,9)==1 ) {
-        program               = valu[0] - ZEROTXT;
+      if ( strcmp("prog",name)==0 ) {
+        val                   = b36_text_value_plus_1(valu,15,0);
+        if( val!=0 ) {
+          program             = val-1;
 #if VERBOSE == 3
-        printf("handler: program set to %s\n",valu);
+          printf("handler: program set to %s\n",valu);
 #endif
+        }
       }
-
     }
     return 1;
   }

@@ -27,7 +27,7 @@ This is hot off the presses and, God willing, will be with us for a very long ti
 
 ### Easy and versatile
 
-The concept is simple:&nbsp; writing to a file seta a value for the LED that file represents.&nbsp; 
+The concept is simple:&nbsp; writing to a file sets a value for the LED that file represents.&nbsp; 
 Reading a button&apos;s value is done by reading from the file representing that button.&nbsp; 
 
 	$ echo 0 > /etc/pleb-gpio/led1            # turn off LED1
@@ -37,7 +37,6 @@ Reading a button&apos;s value is done by reading from the file representing that
 
 It&apos;s universally accessibile.&nbsp; 
 Reading and writing to files with names like `btn0` and `led1` can be done from Bash, Python, JavaScript, C and other languages.&nbsp; 
-Here is what it looks like using Bash script.
 
 ## Basic Usage
 

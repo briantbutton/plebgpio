@@ -1,7 +1,9 @@
-all: plebgpio
+#!/usr/bin/make -f
 
 LINK=-Wall -Wno-char-subscripts 
 CC=gcc
+
+all: plebgpio
 
 plebgpio: plebgpio.c
 	$(CC) $(LINK) $^ -lm -o $@ 

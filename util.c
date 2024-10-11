@@ -34,15 +34,44 @@ int  pleb_sect ( int is ) {
     return 0;
   }
 }
-char is_octal_value ( const char* string, char limit ) {
-  char    str0;
-  if ( strlen(string)==1 ) {
-    str0                      = string[0];
-    if ( str0 < ZEROTXT+limit+1 ) {
-      return 1;
+char b36_text_value_plus_1 ( const char* string, char limit , char incl0 ) {
+  char    val;
+  if ( strlen(string)==1 || strlen(string)==2 ) {
+    if ( string[0] < 128 ) {
+      val                     = b36ins[string[0]];
+      if ( val==0 ) {
+        if ( incl0==1 ) {
+          return 1;
+        } else {
+          return 0;
+        }
+      } else {
+        if ( val < limit+1 ) {
+          return val+1;
+        } else {
+          return 0;
+        }
+      }
     } else {
       return 0;
     }
+  } else {
+    return 0;
+  }
+}
+char legit_next_val (char val) {
+  if ( val==TWOTXT || val==DASHTXT || val==TRETXT || val==BACKTXT || val==QUATXT || val==STOPTXT ) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+char legit_led_val (char val) {
+  if ( val==ZERTXT || val==ZERTXT_ || val==ONETXT || val==ONETXT_ ||
+       val==TWOTXT || val==TWOTXT_ || val==TRETXT || val==TRETXT_ ||
+       val==QUATXT || val==QUATXT_ || val==QUITXT || val==QUITXT_ ||
+       val==SESTXT || val==SESTXT_ || val==SETTXT || val==SETTXT_ ) {
+    return 1;
   } else {
     return 0;
   }

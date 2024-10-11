@@ -14,17 +14,13 @@ void update_prog ( int prog_num , int offset , const char* values ) {
   if ( offset==0 ) {
     while ( limit>i++ ) {
       value                     = values[i];
-      if ( value!=TWOTXT && value!=DASHTXT && value!=TRETXT && value!=BACKTXT && value!=QUATXT && value!=STOPTXT )
+      if ( legit_next_val(values[i])==0 )
         valid                   = 0;
     }
   } else {
     while ( limit>i++ ) {
       value                     = values[i];
-      if ( value!=ZEROTXT && value!=ZEROTXT_ && value!=ONETXT  && value!=ONETXT_  &&
-           value!=TWOTXT  && value!=TWOTXT_  && value!=TRETXT  && value!=TRETXT_  &&
-           value!=QUATXT  && value!=QUATXT_  && value!=QUITXT  && value!=QUITXT_  &&
-           value!=SESTXT  && value!=SESTXT_  && value!=SETTXT  && value!=SETTXT_
-          )
+      if ( legit_led_val(values[i])==0 )
         valid                   = 0;
     }
   }
@@ -33,9 +29,9 @@ void update_prog ( int prog_num , int offset , const char* values ) {
     if ( offset==0 ) {
       while ( limit>i++ ) {
         value                   = values[i];
-        if ( value==TWOTXT || value==DASHTXT )               value                 = 2;
-        if ( value==TRETXT || value==BACKTXT )               value                 = 3;
-        if ( value==QUATXT || value==STOPTXT )               value                 = 4;
+        if ( value==TWOTXT || value==DASHTXT )               value            = 2;
+        if ( value==TRETXT || value==BACKTXT )               value            = 3;
+        if ( value==QUATXT || value==STOPTXT )               value            = 4;
         incumbent               = progs[row][i];
         progs[row][i]           = value;
         if ( all_matched==1 && value!=incumbent ) {
@@ -52,14 +48,14 @@ void update_prog ( int prog_num , int offset , const char* values ) {
     } else {
       while ( limit>i++ ) {
         value                   = values[i];
-        if ( value==ZEROTXT || value==ZEROTXT_ )             value                 = 0;
-        if ( value==ONETXT || value==ONETXT_ )               value                 = 1;
-        if ( value==TWOTXT || value==TWOTXT_ )               value                 = 2;
-        if ( value==TRETXT || value==TRETXT_ )               value                 = 3;
-        if ( value==QUATXT || value==QUATXT_ )               value                 = 4;
-        if ( value==QUITXT || value==QUITXT_ )               value                 = 5;
-        if ( value==SESTXT || value==SESTXT_ )               value                 = 6;
-        if ( value==SETTXT || value==SETTXT_ )               value                 = 7;
+        if ( value==ZERTXT || value==ZERTXT_ )               value            = 0;
+        if ( value==ONETXT || value==ONETXT_ )               value            = 1;
+        if ( value==TWOTXT || value==TWOTXT_ )               value            = 2;
+        if ( value==TRETXT || value==TRETXT_ )               value            = 3;
+        if ( value==QUATXT || value==QUATXT_ )               value            = 4;
+        if ( value==QUITXT || value==QUITXT_ )               value            = 5;
+        if ( value==SESTXT || value==SESTXT_ )               value            = 6;
+        if ( value==SETTXT || value==SETTXT_ )               value            = 7;
         incumbent               = progs[row][i];
         progs[row][i]           = value;
         if ( all_matched==1 && value!=incumbent ){
@@ -76,15 +72,15 @@ void update_prog ( int prog_num , int offset , const char* values ) {
     }
   }
 }
-char recognized_program(char prog){
+char recognized_program(char p){
   char    result              = 0;
-  if ( prog==0  || prog==1  || prog==2  || prog==3  || prog==4  || prog==5  || prog==6  || prog==7  || prog==8  || prog==9  || prog==10 || prog==11 || prog==12 || prog==13 || prog==14 || prog==15 )
+  if ( p==0  || p==1  || p==2  || p==3  || p==4  || p==5  || p==6  || p==7  || p==8  || p==9  || p==10 || p==11 || p==12 || p==13 || p==14 || p==15 || p==16 || p==17 || p==18 || p==19 )
     result                    = 1;
   return result;
 }
-char recognized_color(char prog){
+char recognized_color(char c){
   char    result              = 0;
-  if ( prog==0  || prog==1  || prog==2  || prog==3  || prog==4  || prog==5  || prog==6  || prog==7 )
+  if ( c==0  || c==1  || c==2  || c==3  || c==4  || c==5  || c==6  || c==7 )
     result                    = 1;
   return result;
 }

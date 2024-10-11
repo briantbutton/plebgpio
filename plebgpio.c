@@ -36,7 +36,8 @@
 #define MAX_PATH                   60
 #define PROGRAM_LENGTH             80
 #define ZEROTXT                    48                  // '0'
-#define ZEROTXT_                  111                  // 'o' - off
+#define ZERTXT                     48                  // '0'
+#define ZERTXT_                   111                  // 'o' - off
 #define ONETXT                     49                  // '1'
 #define ONETXT_                    98                  // 'b' - blue
 #define TWOTXT                     50                  // '2'
@@ -137,7 +138,7 @@ int main(int argc, char **argv) {
           bad_program         = 0;
   int     i                   = -1,
           j                   = -1,
-          cycles              = 30000,
+          cycles              = 100000,
           gearing             = 11,read_mask;     // ,write_mask;
   struct  timespec ts         = { .tv_sec = 0 }, 
                    tr         = { .tv_sec = 0 };
@@ -199,7 +200,7 @@ int main(int argc, char **argv) {
     while ( !failed && cycles>i++ ) {
       j                       = -1;
       while ( !failed && gearing>j++ ) {
-        if ( !bad_program  && (j%overspeed)==0 ) {
+        if ( !bad_program  && ( j%overspeed)==0 ) {
           if ( program==0 ) {
             set_leds ( &pins ) ;
           } else {
