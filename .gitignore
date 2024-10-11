@@ -7,6 +7,12 @@ r.js
 video
 xtension
 policy_templates
+raspi-example-gpio-first-orig.c
+raspi-example-gpio-orig.c
+raspi-example-gpio.c
+tranter.c
+coopted-led-example-gpio-num.c
+coopted-led-example-gpio.c
 *.max.js
 *.min.js
 *.max.css
