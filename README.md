@@ -23,7 +23,7 @@ Our searches did not reveal much, and most of that was discontinued.&nbsp;
 ### Current
 
 **plebgpio** is based on the V2 ioctl interface (aka [GPIO Character Device Userspace API](https://www.kernel.org/doc/html/latest/userspace-api/gpio/chardev.html)).&nbsp; 
-This is hot off the presses and, God willing, will be with us for a very long time.&nbsp; 
+This is the latest interface and, God willing, will be with us for a very long time.&nbsp; 
 
 ### Easy and versatile
 
@@ -144,15 +144,19 @@ This program is very pretty.&nbsp;
 	led1=rrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbb
 	led2=ccccmmmmyyyyccccmmmmyyyyccccmmmmyyyyccccmmmmyyyyccccmmmmyyyyccccmmmmyyyy 
 
+Up to 35 programs may be specified, using a single character, base 35.&nbsp; 
+Zero is not allowed.&nbsp; 
+So, the first program would be &apos;1&apos; and the last program would be &apos;Z&apos;.&nbsp; 
+These are just labels; ordinal value has no significance.&nbsp; 
+
 ### Program Operation
 
-Up to 8 programs (1 through 9) may be specified in config.txt.&nbsp; 
-To run a program, put its decimal digit into `/etc/pleb/gpio/prog`.&nbsp; 
-When a program is running, all values in the individual LED files (e.g. `led1`) are ignored.&nbsp; 
+o run a program, put its base 35 digit into `/etc/pleb/gpio/prog`.&nbsp; 
+When a program is running, values in the individual LED files (e.g. `led1`) are ignored.&nbsp; 
 Programs do not affect button operation &mdash; that continues per normal.
 
 Program Zero is special; it means no program, and **plebgpio** looks to the individual LED files to set the LEDs.&nbsp; 
-When the system starts, it will be running program 0, unless otherwise configured.&nbsp; 
+When the system starts, it will run program 0, unless otherwise configured.&nbsp; 
 
 ## How it works
 

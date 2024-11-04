@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
           bad_program         = 0;
   int     i                   = -1,
           j                   = -1,
-          cycles              = 100000,
+          cycles              = 300000,
           gearing             = 11,read_mask;     // ,write_mask;
   struct  timespec ts         = { .tv_sec = 0 }, 
                    tr         = { .tv_sec = 0 };

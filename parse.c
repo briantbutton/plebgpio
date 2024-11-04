@@ -25,11 +25,11 @@ int is_device_string ( const char* string ) {
         is                    = 0 - 11;
     } else {
       str4                    = string[4];
-      // progx, where x is 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E or F
-      if ( ( str4>ONETXT-1 && str4<NINETXT+1 ) || ( str4>64 && str4<75 ) || ( str4>96 && str4<107 ) ) {
-        if ( str4>64 && str4<75 )
+      // progx, where x is a letter or digit, using Base36
+      if ( ( str4>ONETXT-1 && str4<NINETXT+1 ) || ( str4>64 && str4<91 ) || ( str4>96 && str4<123 ) ) {
+        if ( str4>64 && str4<91 )
           str4                = str4 - 7;
-        if ( str4>96 && str4<107 )
+        if ( str4>96 && str4<123 )
           str4                = str4 - 39;
         if ( str0==112 && str1==114 && str2==111 && str3==103 )
           is                  = 10 + str4 - ZEROTXT;
@@ -106,11 +106,11 @@ int handler(void* conf, const char* sect, const char* name, const char* valu){
         }
       }
       if ( strcmp("prog",name)==0 ) {
-        val                   = b36_text_value_plus_1(valu,15,0);
+        val                   = b36_text_value_plus_1(valu,35,0);
         if( val!=0 ) {
           program             = val-1;
 #if VERBOSE == 3
-          printf("handler: program set to %s\n",valu);
+          printf("handler: program set to %d - '%s'\n",val-1,valu);
 #endif
         }
       }
@@ -142,7 +142,7 @@ int initialize_config(int argc, char** argv){
     printf("initial program == %d\n",program);
 #endif
 
-    string[0]                 = program + ZEROTXT;
+    string[0]                 = b36outs[program];
     assemble_path ( fullpath , "" , "" , "prog" ) ;
     file_write ( fullpath , string , 1 );
   }

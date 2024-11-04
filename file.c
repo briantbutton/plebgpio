@@ -34,15 +34,17 @@ void short_file_read(char *path, char *buff, int len) {
   }
 }
 char read_file_digit(char *dir, char *subdir, char *fname){
-  char    buff[8];
+  char    buff[4]             = {   0 ,   0 ,   0 ,   0 };
   char    fullpath[MAX_PATH];
   char    result              = VAL_ERROR;
 
   if(bngpiodir_ok){
     assemble_path(fullpath,dir,subdir,fname);
     short_file_read(fullpath,buff,one);
+    // printf("read_file_digit, path == '%s'\n",fullpath);
     if( buff[0]!=CHAR_ERROR ){
       if( buff[0]<128 && buff[0]>0 ){
+        // printf("read_file_digit, digit == '%s'\n",buff);
         result                = b36ins[buff[0]];
       }
     }
