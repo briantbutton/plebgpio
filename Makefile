@@ -13,5 +13,6 @@ clean:
 	
 install:
 	sudo mv plebgpio /bin
-	sudo chown root:service /bin/plebgpio
+	sudo chown root:dialout /bin/plebgpio
 	sudo chmod 4755 /bin/plebgpio
+	sudo setcap "cap_fowner,cap_chown+ep" /bin/plebgpio

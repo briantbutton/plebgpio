@@ -34,7 +34,8 @@
 #define FAILED_GPIO_WRITE          95
 #define FAILED_GPIO_READ           96
 #define MAX_PATH                   60
-#define PROGRAM_LENGTH             80
+#define PROGRAM_LENGTH             96
+#define LAST_PROGRAM               61
 #define ZEROTXT                    48                  // '0'
 #define ZERTXT                     48                  // '0'
 #define ZERTXT_                   111                  // 'o' - off
@@ -68,7 +69,7 @@
 #define INFOCOLS                   3u
 #define INPUTTIMEOUT              100                  // poll input timeout (ms)
 #define CHAR_ERROR                126                  // '~'
-#define VAL_ERROR                  36                  // Signals base36 (or base16) conversion failed
+#define VAL_ERROR                  73                  // Signals base62, base36 (or base16) conversion failed
 
 
 #include "static.c"
@@ -86,15 +87,13 @@
 
   EMPOWER
   $ sudo mv plebgpio /bin
-  $ sudo chown root:service /bin/plebgpio
+  $ sudo chown root:dialout /bin/plebgpio
   $ sudo chmod 4755 /bin/plebgpio
 
   $ sudo cat /sys/kernel/debug/gpio
 
 
-                  $ sudo setcap cap_fowner+ep /sbin/gpio
-                  $ sudo setcap cap_chown+ep /sbin/gpio
-                  $ sudo setcap "cap_fowner,cap_chown+ep" /sbin/gpio
+                  $ sudo setcap "cap_fowner,cap_chown+ep" /bin/plebgpio
 
 
   /etc/plebgpio/

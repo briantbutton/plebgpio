@@ -20,99 +20,233 @@ pwr=26
 
 [btn0]
 hot=17
-step=2
 
-; Default startup program; to test LED
+; Not used
 [prog1]
 next=-----------------------------------------------------------------------<
 led1=rrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbb
 led2=rrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbb
 
-; A different test program
+; WARMUP
 [prog2]
 next=-----------------------------------------------------------------------<
-led1=rrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbb
-led2=ccccmmmmyyyyccccmmmmyyyyccccmmmmyyyyccccmmmmyyyyccccmmmmyyyyccccmmmmyyyy 
+led1=rrrgggbbbmmmyyycccrrrgggbbbmmmyyycccrrrgggbbbmmmyyycccrrrgggbbbmmmyyyccc
+led2=cccmmmyyygggbbbrrrcccmmmyyygggbbbrrrcccmmmyyygggbbbrrrcccmmmyyygggbbbrrr
 #    012345678901234567890123456789012345678901234567890123456789012345678901
 #    0         1         2         3         4         5         6         7
 
+; UP_HANGING
+[prog3]
+next=-----------------------------------------------------------------------------------------------<
+led1=mmmmmmmmooooooooooooooooooooooooooooooooooooooooommmmmmmmooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+#    012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+#    0         1         2         3         4         5         6         7         8         9
+
+; UP_LONELY_HANGING
 [prog4]
-next=-----------------------------------------------------------------------<
-led1=mmoommoooooooooooooooooommoommoooooooooooooooooommoommoooooooooooooooooo
+next=-----------------------------------------------------------------------------------------------<
+led1=mmmmmmmmooooooooooooooooooooooooooooooooooooooooommmmmmmmooooooooooooooooooooooooooooooooooooooo
+led2=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 
+; UP_TRANSITIONING
 [prog5]
-next=-----------------------------------------------------------------------<
-led1=mmoommoommoooooooooooooommoommoommoooooooooooooommoommoommoooooooooooooo 
+next=-----------------------------------------------------------------------------------------------<
+led1=mmmmmmmmooooooooooooooooooooooooooooooooooooooooommmmmmmmooooooooooooooooooooooooooooooooooooooo
+led2=wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 
+; UP_WARNING
 [prog6]
-next=-----------------------------------------------------------------------<
-led1=ggooggooooooooooooooooooggooggooooooooooooooooooggooggoooooooooooooooooo
+next=-----------------------------------------------------------------------------------------------<
+led1=mmmmmmmmooooooooooooooooooooooooooooooooooooooooommmmmmmmooooooooooooooooooooooooooooooooooooooo
+led2=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
+; UP_PROBLEM
 [prog7]
-next=-----------------------------------------------------------------------<
-led1=ggooggooggooooooooooooooggooggooggooooooooooooooggooggooggoooooooooooooo
+next=-----------------------------------------------------------------------------------------------<
+led1=mmmmmmmmooooooooooooooooooooooooooooooooooooooooommmmmmmmooooooooooooooooooooooooooooooooooooooo
+led2=rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+#    012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+#    0         1         2         3         4         5         6         7         8         9
 
+; UP_GATEWAY
 [prog8]
-next=-----------------------------------------------------------------------<
-led1=mmoommoooooooooooooooooommoommoooooooooooooooooommoommoooooooooooooooooo
-led2=wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+next=-----------------------------------------------------------------------------------------------<
+led1=mmoommoooooooooooooooooommoommoooooooooooooooooommoommoooooooooooooooooommoommoooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 
+; UP_LONELY_GATEWAY
 [prog9]
-next=-----------------------------------------------------------------------<
-led1=mmoommoommoooooooooooooommoommoommoooooooooooooommoommoommoooooooooooooo
-led2=wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+next=-----------------------------------------------------------------------------------------------<
+led1=mmoommoooooooooooooooooommoommoooooooooooooooooommoommoooooooooooooooooommoommoooooooooooooooooo
+led2=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 
+; UP_CLOUD
 [progA]
-next=-----------------------------------------------------------------------<
-led1=ggooggooooooooooooooooooggooggooooooooooooooooooggooggoooooooooooooooooo
-led2=wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+next=-----------------------------------------------------------------------------------------------<
+led1=mmoommoommoooooooooooooommoommoommoooooooooooooommoommoommoooooooooooooommoommoommoooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 
+; UP_LONELY_CLOUD
 [progB]
-next=-----------------------------------------------------------------------<
-led1=ggooggooggooooooooooooooggooggooggooooooooooooooggooggooggoooooooooooooo
-led2=wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+next=-----------------------------------------------------------------------------------------------<
+led1=mmoommoommoooooooooooooommoommoommoooooooooooooommoommoommoooooooooooooommoommoommoooooooooooooo
+led2=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 
+; DN_TRANSITIONING
 [progC]
-next=-----------------------------------------------------------------------<
-led1=mmmmoooooooooooooooooooommmmoooooooooooooooooooommmmoooooooooooooooooooo
-led2=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-
+next=-----------------------------------------------------------------------------------------------<
+led1=ggggggggoooooooooooooooooooooooooooooooooooooooooggggggggooooooooooooooooooooooooooooooooooooooo
+led2=wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+#    012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+#    0         1         2         3         4         5         6         7         8         9
+; DN_WARNING
 [progD]
-next=-----------------------------------------------------------------------<
-led1=ggggooooooooooooooooooooggggooooooooooooooooooooggggoooooooooooooooooooo
-led2=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+next=-----------------------------------------------------------------------------------------------<
+led1=ggggggggoooooooooooooooooooooooooooooooooooooooooggggggggooooooooooooooooooooooooooooooooooooooo
+led2=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
+; DN_PROBLEM
 [progE]
-next=-----------------------------------------------------------------------<
-led1=mmmmoooooooooooooooooooommmmoooooooooooooooooooommmmoooooooooooooooooooo
-led2=rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+next=-----------------------------------------------------------------------------------------------<
+led1=ggggggggoooooooooooooooooooooooooooooooooooooooooggggggggooooooooooooooooooooooooooooooooooooooo
+led2=rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 
+; DN_WORKING
 [progF]
-next=-----------------------------------------------------------------------<
-led1=ggggooooooooooooooooooooggggooooooooooooooooooooggggoooooooooooooooooooo
-led2=rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+next=-----------------------------------------------------------------------------------------------<
+led1=ggooggooooooooooooooooooggooggooooooooooooooooooggooggooooooooooooooooooggooggoooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 
+; DN_LONELY_WORKING
 [progG]
-next=-------------------------------------------------------------------------------<
-led1=gggggooooooooooooooommmmmooooooooooooooogggggooooooooooooooommmmmooooooooooooooo
-led2=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-#    01234567890123456789012345678901234567890123456789012345678901234567890123456789
-#    0         1         2         3         4         5         6         7
+next=-----------------------------------------------------------------------------------------------<
+led1=ggooggooooooooooooooooooggooggooooooooooooooooooggooggooooooooooooooooooggooggoooooooooooooooooo
+led2=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 
-[progK]
+; DN_CONNECTED
+[progH]
+next=-----------------------------------------------------------------------------------------------<
+led1=ggooggooggooooooooooooooggooggooggooooooooooooooggooggooggooooooooooooooggooggooggoooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; DN_LONELY_HANGING
+[progI]
+next=-----------------------------------------------------------------------------------------------<
+led1=ggggggggoooooooooooooooooooooooooooooooooooooooooggggggggooooooooooooooooooooooooooooooooooooooo
+led2=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+
+; UP_CHOOSER
+[progJ]
 next=-------------------------------------------------------------------------------<
 led1=mmmmmooooommmmmooooommmmmooooommmmmooooommmmmooooommmmmooooommmmmooooommmmmooooo
 led2=ooooommmmmooooommmmmooooommmmmooooommmmmooooommmmmooooommmmmooooommmmmooooommmmm
-#    01234567890123456789012345678901234567890123456789012345678901234567890123456789
-#    0         1         2         3         4         5         6         7
+#    012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+#    0         1         2         3         4         5         6         7         8         9
 
-[progL]
+; DN_CHOOSER
+[progK]
 next=-------------------------------------------------------------------------------<
 led1=gggggooooogggggooooogggggooooogggggooooogggggooooogggggooooogggggooooogggggooooo
 led2=ooooogggggooooogggggooooogggggooooogggggooooogggggooooogggggooooogggggoooooggggg
 
+; TBD_L                                                                                         TBD_L
+[progL]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+#    012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+#    0         1         2         3         4         5         6         7         8         9
+
+; TBD_M                                                                                         TBD_M
+[progM]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_N                                                                                         TBD_N
+[progN]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_O                                                                                         TBD_O
+[progO]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_P                                                                                         TBD_P
+[progP]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_Q                                                                                         TBD_Q
+[progQ]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_R                                                                                         TBD_R
+[progR]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_S                                                                                         TBD_S
+[progS]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_T                                                                                         TBD_T
+[progT]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_U                                                                                         TBD_U
+[progU]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_V                                                                                         TBD_V
+[progV]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_W                                                                                         TBD_W
+[progW]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+
+; TBD_X                                                                                         TBD_X
+[progX]
+next=-----------------------------------------------------------------------------------------------<
+led1=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+led2=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+#    012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+#    0         1         2         3         4         5         6         7         8         9
+
+; NA_WARNING
+[progY]
+next=-------------------------------------------------------------------------------<
+led1=ggggggoooooooooooooooooooooooooooooooooommmmmmoooooooooooooooooooooooooooooooooo
+led2=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+#    012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+#    0         1         2         3         4         5         6         7         8         9
+
 [progZ]
-next=-----------------------------------------------------------------------<
-led1=rrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbb
-led2=rrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbbrrrrggggbbbb
+next=-----------------------------------------------------------------------------------------<
+led1=rrrrrrggggggbbbbbbrrrrrrggggggbbbbbbrrrrrrggggggbbbbbbrrrrrrggggggbbbbbbrrrrrrggggggbbbbbb
+led2=rrrrrrggggggbbbbbbrrrrrrggggggbbbbbbrrrrrrggggggbbbbbbrrrrrrggggggbbbbbbrrrrrrggggggbbbbbb
+
+[progz]
+next=-----------------------------------------------------------------------------------------------<
+led1=rrrrrrrrrrggggggggggbbbbbbbbbbrrrrrrrrrrggggggggggbbbbbbbbbbrrrrrrrrrrggggggggggbbbbbbbbbboooooo
+led2=rrrrrrrrrrggggggggggbbbbbbbbbbrrrrrrrrrrggggggggggbbbbbbbbbbrrrrrrrrrrggggggggggbbbbbbbbbboooooo
 

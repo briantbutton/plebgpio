@@ -74,7 +74,7 @@ void update_prog ( int prog_num , int offset , const char* values ) {
 }
 char recognized_program(char p){
   char    result              = 0;
-  if ( p==0  || p==1  || p==2  || p==3  || p==4  || p==5  || p==6  || p==7  || p==8  || p==9  || p==10 || p==11 || p==12 || p==13 || p==14 || p==15 || p==16 || p==17 || p==18 || p==19 || p==20 || p==21 || p==22 || p==23 || p==24 || p==25 || p==26 || p==27 || p==28 || p==29 || p==30 || p==31 || p==32 || p==33 || p==34 || p==35 )
+  if ( p==0  || p==LAST_PROGRAM || ( p>0 && p<LAST_PROGRAM ) ) 
     result                    = 1;
   return result;
 }
@@ -122,17 +122,17 @@ char ledmod ( bn_gpio_led *led ) {
 // char is not a good type if there are more than 7 LED pins in total
 // WARNING                                                        WARNING
 int step_program(gpio_v2_t *pins){
-  int     write_mask          = config.write_mask;
-  char    prog                = program*5,
-          prog_led            = prog+1,
-          led_xer             = 1,
+  int     write_mask          = config.write_mask,
+          prog5               = program*5,
+          prog_led            = prog5+1;
+  char    led_xer             = 1,
           led_mod             = 1,
           led_val             = 0;
   char    led_net[4]          = { 0 , 0 , 0 , 0 };
   int     bits                = 0,
           i                   = -1;
 
-  // printf("step_program, prog == %d, program == %d, prog_led == %d\n",prog,program,prog_led);
+  // printf("step_program, prog5 == %d, program == %d, prog_led == %d\n",prog5,program,prog_led);
 
   if( opcode==STOP || opcode==LOOP ){
     program_ix                = 0;
@@ -140,13 +140,15 @@ int step_program(gpio_v2_t *pins){
       opcode                  = CNTNU;
     }
   }else{
-    if( 70<program_ix++ ){
+    program_ix++;
+    if( program_ix>(PROGRAM_LENGTH-1) ){
       opcode                  = STOP;
+      program_ix              = 0;
     }
   }
 
   if ( opcode==CNTNU && write_mask>0 ) {
-    opcode                    = progs[prog][program_ix];
+    opcode                    = progs[prog5][program_ix];
     if ( opcode==CNTNU || opcode==LOOP || opcode==STOP ) {
 
       while ( 3 > i++ ) {
@@ -178,8 +180,6 @@ void set_leds(gpio_v2_t *pins){
   char    led_net[4]          = { 0 , 0 , 0 , 0 };
   int     bits                = 0,
           i                   = -1;
-
-  // printf("step_program, prog == %d, program == %d, prog_led == %d\n",prog,program,prog_led);
 
   while ( 3 > i++ ) {
     led_val                   = retrieve_led(i);
@@ -241,4 +241,3 @@ int read_and_process_buttons ( gpio_v2_t *pins ) {
 }
 //   PROG                               PROG                                 PROG
 // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
-

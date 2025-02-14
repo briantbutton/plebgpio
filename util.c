@@ -1,5 +1,5 @@
 
-int  unmatched_sect ( int is ) {
+int  unrecognized_sect ( int is ) {
   if ( is==0 ) {
     return 1;
   } else {
@@ -34,11 +34,11 @@ int  pleb_sect ( int is ) {
     return 0;
   }
 }
-char b36_text_value_plus_1 ( const char* string, char limit , char incl0 ) {
+char b62_text_value_plus_1 ( const char* string, char limit , char incl0 ) {
   char    val;
   if ( strlen(string)==1 || strlen(string)==2 ) {
-    if ( string[0] < 128 ) {
-      val                     = b36ins[string[0]];
+    if ( string[0]<128 && string[0]>0 ) {
+      val                     = b62ins[string[0]];
       if ( val==0 ) {
         if ( incl0==1 ) {
           return 1;

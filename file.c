@@ -41,11 +41,9 @@ char read_file_digit(char *dir, char *subdir, char *fname){
   if(bngpiodir_ok){
     assemble_path(fullpath,dir,subdir,fname);
     short_file_read(fullpath,buff,one);
-    // printf("read_file_digit, path == '%s'\n",fullpath);
     if( buff[0]!=CHAR_ERROR ){
       if( buff[0]<128 && buff[0]>0 ){
-        // printf("read_file_digit, digit == '%s'\n",buff);
-        result                = b36ins[buff[0]];
+        result                = b62ins[buff[0]];
       }
     }
   }
@@ -69,4 +67,3 @@ char verify_dir_exists(char *path){
 }
 //   FILE                               FILE                                 FILE
 // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
-
