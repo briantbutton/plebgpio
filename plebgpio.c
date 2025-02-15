@@ -41,6 +41,7 @@
 #define ZERTXT_                   111                  // 'o' - off
 #define ONETXT                     49                  // '1'
 #define ONETXT_                    98                  // 'b' - blue
+#define ONETXT__                  111                  // 'n' - on
 #define TWOTXT                     50                  // '2'
 #define TWOTXT_                   103                  // 'g' - green
 #define TRETXT                     51                  // '3'
@@ -137,7 +138,7 @@ int main(int argc, char **argv) {
           bad_program         = 0;
   int     i                   = -1,
           j                   = -1,
-          cycles              = 300000,
+          cycles              = 1000000,
           gearing             = 11,read_mask;     // ,write_mask;
   struct  timespec ts         = { .tv_sec = 0 }, 
                    tr         = { .tv_sec = 0 };

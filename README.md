@@ -1,9 +1,12 @@
 # plebgpio
 
-**plebgpio** provides a high level API for GPIO operation of LEDs and buttons.&nbsp; 
-It is configured with a simple config file using *"standard"* conventions.&nbsp; 
-Control and telemetry passes through another handful of files.&nbsp; 
-The config file and other files live in the "pleb" directory (`/etc/pleb/gpio/`).&nbsp; 
+**plebgpio** provides a file-based API for GPIO operation of LEDs and buttons.&nbsp; 
+Poke a value into a file to set an LED, or read a file to learn state of a button.&nbsp; 
+A config file is offered to allow programmers to map GPIO pins to buttons or LEDs.&nbsp; 
+All of the files are in the "pleb" directory (`/etc/pleb/gpio/`).&nbsp; 
+
+A SystemD service runs in background which wrangles the GPIO and monitors/changes files,
+presenting a simple interface to applications.
 
 ### Highlights
 
@@ -22,7 +25,8 @@ Our searches did not reveal much, and most of that was discontinued.&nbsp;
 
 ### Current
 
-**plebgpio** is based on the V2 ioctl interface (aka [GPIO Character Device Userspace API](https://www.kernel.org/doc/html/latest/userspace-api/gpio/chardev.html)).&nbsp; 
+**plebgpio** is based on the V2 ioctl interface
+(aka [GPIO Character Device Userspace API](https://www.kernel.org/doc/html/latest/userspace-api/gpio/chardev.html)).&nbsp; 
 This is the latest interface and, God willing, will be with us for a very long time.&nbsp; 
 
 ### Easy and versatile
@@ -76,7 +80,7 @@ The operation below will return a '1' or a '0'.&nbsp;
 	$ cat /etc/pleb/gpio/btn0                 # see whether BTN0 is depressed
 
 If you want your software to monitor `btn0`, you will want to poll this file.&nbsp;
-Our poll rate is 250ms.&nbsp; 
+A poll rate of 100ms to 200ms is suggested.&nbsp; 
 
 ## Advanced Operation &mdash; Colors
 
@@ -100,14 +104,33 @@ While monochrome LEDs accept a binary value (0 or 1), 3-color LEDs take an octal
 The coding is rgb; red == 4, green == 2 and blue == 1.&nbsp;
 Now, we do it this way:&nbsp; 
 
-	$ echo 5 > /etc/pleb-gpio/led2              # magenta in LED2
+	$ echo 5 > /etc/pleb-gpio/led2               # magenta in LED2
+
+### Color Specification
+
+To make life more human friendly, **plebgpio** supports use of letters to specify a color.&nbsp; 
+In the example above, 'm' may be substituted for '5', giving you the syntax below.&nbsp; 
+
+	$ echo m > /etc/pleb-gpio/led2               # magenta in LED2
+
+Our gang found this nomenclature especially handy when writing programs _(described below)_.&nbsp; 
+This is the full glossary:&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`o`&nbsp;&nbsp; 0&nbsp;&nbsp; _(off)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`n`&nbsp;&nbsp; 1&nbsp;&nbsp; _(on)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`b`&nbsp;&nbsp; 1&nbsp;&nbsp; _(blue)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`g`&nbsp;&nbsp; 2&nbsp;&nbsp; _(green)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`c`&nbsp;&nbsp; 3&nbsp;&nbsp; _(cyan)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`r`&nbsp;&nbsp; 4&nbsp;&nbsp; _(red)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`m`&nbsp;&nbsp; 5&nbsp;&nbsp; _(magenta)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`y`&nbsp;&nbsp; 6&nbsp;&nbsp; _(yellow)_&nbsp;  
+&nbsp;&nbsp;&nbsp;&bull;&nbsp;`w`&nbsp;&nbsp; 7&nbsp;&nbsp; _(white)_&nbsp;  
 
 ## Advanced Operation &mdash; Programs
 
 ### Program Configuration
 
 We frequently signal information with time-related behavior &mdash; like a fast blink or a slow blink.&nbsp; 
-This can be done by the user program but **plebgpio** supports it to offload housekeeping, using "**programs**".&nbsp; 
+This can be done in the application software but **plebgpio** supports it to offload housekeeping, using "**programs**".&nbsp; 
 A program is a time-series of display, normally running in a loop.&nbsp; 
 Let's look at one.&nbsp; 
 
@@ -123,17 +146,8 @@ Each period of the program is one eighth of a second, 125ms.&nbsp;
 The top row, `next=` describes what happens next &mdash; `-` means "continue" `<` means "loop from the start", and `x` means stop.&nbsp; 
 The second row, `led1=` assigns an octal value to LED1 for that period.&nbsp; 
 Program 6 above illuminates LED1 green for 250ms, then off for 250ms then green again.&nbsp; 
-
-In a program, _(and ONLY in a program)_ we use letters for the octal (or binary) codes:&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`o`&nbsp;&nbsp; 0&nbsp;&nbsp; _(off)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`p`&nbsp;&nbsp; 1&nbsp;&nbsp; _(pwr)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`b`&nbsp;&nbsp; 1&nbsp;&nbsp; _(blue)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`g`&nbsp;&nbsp; 2&nbsp;&nbsp; _(green)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`c`&nbsp;&nbsp; 3&nbsp;&nbsp; _(cyan)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`r`&nbsp;&nbsp; 4&nbsp;&nbsp; _(red)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`m`&nbsp;&nbsp; 5&nbsp;&nbsp; _(magenta)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`y`&nbsp;&nbsp; 6&nbsp;&nbsp; _(yellow)_&nbsp;  
-&nbsp;&nbsp;&nbsp;&bull;&nbsp;`w`&nbsp;&nbsp; 7&nbsp;&nbsp; _(white)_&nbsp;  
+Note that `0` and `2` could be substituted for `o` and `g`, respectively.&nbsp;
+We like the alphabetic approach better.&nbsp; 
 
 A program can be up to 80 segments _(10 seconds)_ long before it repeats or stops.&nbsp; 
 It may specify multiple LEDs which will display in lock step.&nbsp; 

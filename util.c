@@ -67,7 +67,7 @@ char legit_next_val (char val) {
   }
 }
 char legit_led_val (char val) {
-  if ( val==ZERTXT || val==ZERTXT_ || val==ONETXT || val==ONETXT_ ||
+  if ( val==ZERTXT || val==ZERTXT_ || val==ONETXT || val==ONETXT_ ||val==ONETXT__ ||
        val==TWOTXT || val==TWOTXT_ || val==TRETXT || val==TRETXT_ ||
        val==QUATXT || val==QUATXT_ || val==QUITXT || val==QUITXT_ ||
        val==SESTXT || val==SESTXT_ || val==SETTXT || val==SETTXT_ ) {

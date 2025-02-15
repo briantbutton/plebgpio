@@ -13,13 +13,11 @@ void update_prog ( int prog_num , int offset , const char* values ) {
 #endif
   if ( offset==0 ) {
     while ( limit>i++ ) {
-      value                     = values[i];
       if ( legit_next_val(values[i])==0 )
         valid                   = 0;
     }
   } else {
     while ( limit>i++ ) {
-      value                     = values[i];
       if ( legit_led_val(values[i])==0 )
         valid                   = 0;
     }
@@ -47,15 +45,7 @@ void update_prog ( int prog_num , int offset , const char* values ) {
 #endif
     } else {
       while ( limit>i++ ) {
-        value                   = values[i];
-        if ( value==ZERTXT || value==ZERTXT_ )               value            = 0;
-        if ( value==ONETXT || value==ONETXT_ )               value            = 1;
-        if ( value==TWOTXT || value==TWOTXT_ )               value            = 2;
-        if ( value==TRETXT || value==TRETXT_ )               value            = 3;
-        if ( value==QUATXT || value==QUATXT_ )               value            = 4;
-        if ( value==QUITXT || value==QUITXT_ )               value            = 5;
-        if ( value==SESTXT || value==SESTXT_ )               value            = 6;
-        if ( value==SETTXT || value==SETTXT_ )               value            = 7;
+        value                   = colorout[values[i]];
         incumbent               = progs[row][i];
         progs[row][i]           = value;
         if ( all_matched==1 && value!=incumbent ){
@@ -73,34 +63,25 @@ void update_prog ( int prog_num , int offset , const char* values ) {
   }
 }
 char recognized_program(char p){
-  char    result              = 0;
-  if ( p==0  || p==LAST_PROGRAM || ( p>0 && p<LAST_PROGRAM ) ) 
-    result                    = 1;
+  char    result              = VAL_ERROR;
+  if ( p==0 || p==LAST_PROGRAM || ( p>0 && p<LAST_PROGRAM ) ) 
+    result                    = p;
   return result;
 }
 char recognized_color(char c){
   char    result              = 0;
-  if ( c==0  || c==1  || c==2  || c==3  || c==4  || c==5  || c==6  || c==7 )
-    result                    = 1;
+  if( c==0 || ( c>0 && c<VAL_ERROR ) )
+    result                    = colorout[c];
   return result;
 }
 char retrieve_program(){
   char    prog                = read_file_digit("","","prog");
-  // printf ( "retrieve_program:  %d\n",prog);
-  if ( recognized_program(prog) ) {
-    return prog;
-  } else {
-    return VAL_ERROR;
-  }
+  return recognized_program(prog);
 }
 char retrieve_led(char led_num){
   char    label[5]            = { 108 , 101 , 100 , led_num+ZEROTXT , 0 },
           colr                = read_file_digit("","",label);
-  if ( recognized_color(colr) ) {
-    return colr;
-  } else {
-    return 0;
-  }
+  return recognized_color(colr);
 }
 int transition_program(char new_program){
 #if VERBOSE == 1 || VERBOSE == 2 || VERBOSE == 3
