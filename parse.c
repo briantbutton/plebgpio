@@ -14,18 +14,21 @@ int is_device_string ( const char* string ) {
     str2                      = string[2];
     str3                      = string[3];
     if ( length==4 ) {
+
       // led0, led1, led2, led3
       if ( ( str0==108 && str1==101 && str2==100 ) && ( str3==48 || str3==49 || str3==50 || str3==51 ) )
         is                    = 0 + 1 + (str3-ZEROTXT);
+
       // btn0, btn1, btn2
       if ( ( str0==98  && str1==116 && str2==110 ) && ( str3==48 || str3==49 || str3==50 ) )
         is                    = 0 - 1 - (str3-ZEROTXT);
+
       // pleb
       if ( str0==112  && str1==108 && str2==101 && str3==98 )
         is                    = 0 - 11;
     } else {
       str4                    = string[4];
-      // progx, where x is a letter or digit, using Base36
+      // progx, where x is a letter or digit, using Base62
       if ( ( str4>ONETXT-1 && str4<NINETXT+1 ) || ( str4>64 && str4<91 ) || ( str4>96 && str4<123 ) ) {
         if ( str4>64 && str4<91 )
           str4                = str4 - 7;
@@ -38,6 +41,7 @@ int is_device_string ( const char* string ) {
   }
   return is;
 }
+
 //  ~   ~    ~     ~      ~       ~        ~         ~          ~           ~            ~             ~
 // Called for each statement line of config.txt
 // Amends structures of global variable 'config', which holds configuration of buttons and LEDs
@@ -98,7 +102,7 @@ int handler(void* conf, const char* sect, const char* name, const char* valu){
         val                   = b62_text_value_plus_1(valu,2,0);
         if( val!=0 ) {
           overspeed           = val-1;
-#if VERBOSE == 1 || VERBOSE == 2
+#if VERBOSE == 2 || VERBOSE == 3
           printf("handler: overspeed set to %d\n",overspeed);
 #endif
         }
@@ -110,7 +114,15 @@ int handler(void* conf, const char* sect, const char* name, const char* valu){
 #if VERBOSE == 3
           printf("handler: program set to %d - '%s'\n",val-1,valu);
 #endif
-          printf("handler: program set to %d - '%s'\n",val-1,valu);
+        }
+      }
+      if ( strcmp("test",name)==0 ) {
+        val                   = b62_text_value_plus_1(valu,3,0);
+        if( val!=0 ) {
+          test                = val-1;
+#if VERBOSE == 3
+          printf("handler: test set to %d - '%s'\n",val-1,valu);
+#endif
         }
       }
     }

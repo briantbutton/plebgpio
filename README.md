@@ -146,6 +146,7 @@ Each period of the program is one eighth of a second, 125ms.&nbsp;
 The top row, `next=` describes what happens next &mdash; `-` means "continue" `<` means "loop from the start", and `x` means stop.&nbsp; 
 The second row, `led1=` assigns an octal value to LED1 for that period.&nbsp; 
 Program 6 above illuminates LED1 green for 250ms, then off for 250ms then green again.&nbsp; 
+
 Note that `0` and `2` could be substituted for `o` and `g`, respectively.&nbsp;
 We like the alphabetic approach better.&nbsp; 
 
@@ -165,7 +166,7 @@ These are just labels; ordinal value has no significance.&nbsp;
 
 ### Program Operation
 
-o run a program, put its base 35 digit into `/etc/pleb/gpio/prog`.&nbsp; 
+To run a program, put its base 35 digit into `/etc/pleb/gpio/prog`.&nbsp; 
 When a program is running, values in the individual LED files (e.g. `led1`) are ignored.&nbsp; 
 Programs do not affect button operation &mdash; that continues per normal.
 
@@ -222,7 +223,7 @@ Here is a comprehensive list of the available sections:&nbsp;
 
 ## Acknowlegements
 
-Someone going by **drankinatty** in the [Raspberry Pi Forums](https://forums.raspberrypi.com/viewtopic.php?p=2218500) wrote the V2 functions that are being used here.&nbsp; 
+Someone going by **drankinatty** in the [Raspberry Pi Forums](https://forums.raspberrypi.com/viewtopic.php?p=2218500#p2219918) wrote the V2 functions that are being used here.&nbsp; 
 Thanks **drankinatty** wherever you are.&nbsp; 
 
 The config file parser uses the simple but effective code we found [here](https://github.com/benhoyt/inih).&nbsp; 

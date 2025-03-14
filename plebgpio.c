@@ -33,6 +33,7 @@
 #define BAD_OPCODE                 94
 #define FAILED_GPIO_WRITE          95
 #define FAILED_GPIO_READ           96
+#define NO_LINES_CONFIGURED        97
 #define MAX_PATH                   60
 #define PROGRAM_LENGTH             96
 #define LAST_PROGRAM               61
@@ -86,18 +87,10 @@
   $ gcc -Wall -Wno-char-subscripts gpio.c -o gpio
   $ gcc -Wall -Wno-char-subscripts gpio.c -Wno-unused-but-set-variable -Wno-unused-variable -o gpio
 
-  EMPOWER
-  $ sudo mv plebgpio /bin
-  $ sudo chown root:dialout /bin/plebgpio
-  $ sudo chmod 4755 /bin/plebgpio
 
   $ sudo cat /sys/kernel/debug/gpio
 
-
-                  $ sudo setcap "cap_fowner,cap_chown+ep" /bin/plebgpio
-
-
-  /etc/plebgpio/
+  /etc/pleb/gpio/
             ~ led0/
             ~ led1/
             ~ led2/
@@ -110,46 +103,30 @@
 */
 
 
-// *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
-//  NOT USED                         NOT USED                          NOT USED
-void doze_briefly(){
-  struct  timespec remaining, request = { 0, 62500000 }; 
-  int     slept               = nanosleep(&request, &remaining);
-
-#if VERBOSE == 1 || VERBOSE == 2|| VERBOSE == 3
-  if( slept!=0 ){
-    if(errno==EINTR){
-      printf("interrupted by a signal handler\n");
-    }else{
-      printf("bad sleep\n");
-    }
-  }
-#endif
-}
-//  NOT USED                         NOT USED                          NOT USED
-// *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
-
-
 int main(int argc, char **argv) {
-  unsigned delayns            = 125000000;
-  char    new_program         = initialize_config(argc,argv),
+  char    delayms             = 125,
+          new_program         = initialize_config(argc,argv),
           next_opcode         = LOOP,
           failed              = 0,
-          bad_program         = 0;
+          bad_program         = 0,
+          off                 = 0;
   int     i                   = -1,
           j                   = -1,
           cycles              = 1000000,
-          gearing             = 11,read_mask;     // ,write_mask;
+          gearing             = 12,read_mask,testlimit;
   struct  timespec ts         = { .tv_sec = 0 }, 
                    tr         = { .tv_sec = 0 };
+  unsigned delayns            = delayms*1000000;
+
+  if ( config.line_count==0 ) return NO_LINES_CONFIGURED;
+
   ts.tv_nsec                  = delayns / overspeed;
+  testlimit                   = test * 60 * 1000 * overspeed / ( delayms * gearing );
 
   read_mask                   = config.read_mask;
-  // write_mask                  = config.write_mask;
 
   // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
   //   SETUP GPIO                       SETUP GPIO                       SETUP GPIO
-
   if ( !problem )
     if ( ( chip_fd = gpio_dev_open (GPIOCHIP) ) < 0)
       problem                 = CHIP_OPEN_ERROR;
@@ -174,16 +151,16 @@ int main(int argc, char **argv) {
     while ( config.line_count-1>j++ )                  pins.linereq->offsets[j]= config.offsets[j]->pin;
 
 #if VERBOSE == 3
-    printf("\nread_mask == %d, write_mask == %d, weight == %d, line_limit == %d\n",read_mask,write_mask,config.curr_weight,config.line_count-1);
+    printf("\nread_mask == %d, weight == %d, line_limit == %d\n",read_mask,config.curr_weight,config.line_count-1);
 #endif
 
-    pins.linereq->num_lines     = j;
+    pins.linereq->num_lines   = j;
 
-    pins.linevals->bits         = read_mask;
-    pins.linevals->mask         = read_mask;
+    pins.linevals->bits       = read_mask;
+    pins.linevals->mask       = read_mask;
 
-    pins.linecfg->num_attrs     = 1;
-    pins.linecfg->attrs[0]      = rd_cfg_attr;
+    pins.linecfg->num_attrs   = 1;
+    pins.linecfg->attrs[0]    = rd_cfg_attr;
 
     if (prn_gpio_v2_ghip_info (pins.fd) == -1)         return 1;
     if (gpio_line_cfg_ioctl (&pins) == -1)             return 1;
@@ -196,13 +173,18 @@ int main(int argc, char **argv) {
     printf("\ncycles == %d, i == %d\n",cycles,i);
 #endif
 
+
+    // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
+    //  LOOPA LOOP                     LOOPA LOOP                      LOOPA LOOP
+    gearing                   = gearing-1;
     next_opcode               = transition_program(new_program);
     while ( !failed && cycles>i++ ) {
       j                       = -1;
       while ( !failed && gearing>j++ ) {
         if ( !bad_program  && ( j%overspeed)==0 ) {
-          if ( program==0 ) {
-            set_leds ( &pins ) ;
+          if ( program==0 || off==1 ) {
+            set_leds ( &pins , off ) ;
+            off               = 0;
           } else {
             if ( next_opcode!=STOP || program_ix!=0 ) {
               next_opcode     = step_program ( &pins ) ;
@@ -214,6 +196,7 @@ int main(int argc, char **argv) {
         if ( !failed ) {
           failed              = read_and_process_buttons ( &pins ) ;
           new_program         = retrieve_program();
+          if ( i < testlimit )  off = retrieve_off();
           if( new_program!=VAL_ERROR && new_program!=program ){
             bad_program       = 0;
             next_opcode       = transition_program(new_program);
@@ -222,6 +205,9 @@ int main(int argc, char **argv) {
         }
       }
     }
+    //  LOOPA LOOP                     LOOPA LOOP                      LOOPA LOOP
+    // *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-* *-*=*  *=*-*  *=*-*  *=*-*
+
     usleep (INPUTTIMEOUT * 1000);               // delay input timeout microsecs 
     gpio_dev_close (chip_fd);
   }

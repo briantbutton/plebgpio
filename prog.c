@@ -45,7 +45,7 @@ void update_prog ( int prog_num , int offset , const char* values ) {
 #endif
     } else {
       while ( limit>i++ ) {
-        value                   = colorout[values[i]];
+        value                   = colorout[b62ins[values[i]]];
         incumbent               = progs[row][i];
         progs[row][i]           = value;
         if ( all_matched==1 && value!=incumbent ){
@@ -68,6 +68,12 @@ char recognized_program(char p){
     result                    = p;
   return result;
 }
+char recognized_binary(char c){
+  char    result              = 0;
+  if( c==0 || c==1 )
+    result                    = c;
+  return result;
+}
 char recognized_color(char c){
   char    result              = 0;
   if( c==0 || ( c>0 && c<VAL_ERROR ) )
@@ -77,6 +83,10 @@ char recognized_color(char c){
 char retrieve_program(){
   char    prog                = read_file_digit("","","prog");
   return recognized_program(prog);
+}
+char retrieve_off(){
+  char    prog                = read_file_digit("","","off");
+  return recognized_binary(prog);
 }
 char retrieve_led(char led_num){
   char    label[5]            = { 108 , 101 , 100 , led_num+ZEROTXT , 0 },
@@ -153,7 +163,7 @@ int step_program(gpio_v2_t *pins){
     return opcode;
   }
 }
-void set_leds(gpio_v2_t *pins){
+void set_leds(gpio_v2_t *pins, char off){
   int     write_mask          = config.write_mask;
   char    led_xer             = 1,
           led_mod             = 1,
@@ -163,7 +173,11 @@ void set_leds(gpio_v2_t *pins){
           i                   = -1;
 
   while ( 3 > i++ ) {
-    led_val                   = retrieve_led(i);
+    if ( off==1 ) {
+      led_val                 = 0;
+    } else {
+      led_val                 = retrieve_led(i);
+    }
     led_xer                   = led_xer * led_mod;
     led_mod                   = ledmod(leds[i]);
     led_net[i]                = ( led_val % led_mod ) * led_xer;
@@ -194,7 +208,7 @@ void process_button ( int read_values , bn_gpio_btn* btn ) {
       assemble_path(fullpath,"","",fname);
       file_write ( fullpath , string , 1 );
 #if VERBOSE == 1 || VERBOSE == 2 || VERBOSE == 3
-      printf("process_buttons: writing value '%c' to '%s'\n",string[0],fullpath);
+      printf("process_button: writing value '%c' to '%s'\n",string[0],fullpath);
 #endif
       line->val               = curr_val;
     }

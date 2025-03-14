@@ -3,12 +3,13 @@ Description=Pleb GPIO
 Documentation=https://github.com/briantbutton/pleb-gpio
 After=network.target
 
-; User need NOT be root but should be in the 'dialout' group
+; User need NOT be root
 ; https://forums.raspberrypi.com/viewtopic.php?t=340199
 [Service]
 Type=simple
-User=root
+User=localserver
 ExecStart=/usr/bin/plebgpio
+AmbientCapabilities=CAP_FOWNER CAP_CHOWN
 Restart=no
 
 [Install]

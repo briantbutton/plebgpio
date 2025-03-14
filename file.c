@@ -18,7 +18,7 @@ void file_write(char *path, char *buff, char len) {
   }
 }
 void short_file_read(char *path, char *buff, int len) {
-  FILE    *fp                 = fopen(path,"r");
+  FILE    *fp                 = fopen(path, "r");
   int     i                   = -1,
           l                   = len-1;
   char    c;
