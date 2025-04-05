@@ -11,8 +11,10 @@ raspi-example-gpio-first-orig.c
 raspi-example-gpio-orig.c
 raspi-example-gpio.c
 tranter.c
-coopted-led-example-gpio-num.c
-coopted-led-example-gpio.c
+sigaction.c
+sigqueue.c
+nanosleep.c
+coopted-led-*.c
 *.max.js
 *.min.js
 *.max.css
