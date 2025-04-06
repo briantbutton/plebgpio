@@ -1,0 +1,12 @@
+Source: plebgpio
+Section: utils
+Priority: optional
+Maintainer: Brian Button <bb@buttonnet.com>
+Standards-Version: 4.5.0
+Build-Depends: debhelper (>=13.0.0), dh-systemd (>= 1.5), debhelper-compat (=13)
+
+Package: plebgpio
+Architecture: arm64
+Description: Controls leds and buttons on GPIO for Raspberry Pi
+ PlebGPIO is designed as a SystemD utility that runs in background,
+ providing simple and high level control of buttons and leds

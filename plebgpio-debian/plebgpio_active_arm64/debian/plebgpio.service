@@ -1,0 +1,14 @@
+[Unit]
+Description=Plebeian GPIO
+Documentation=https://github.com/briantbutton/pleb-gpio
+After=network.target
+
+[Service]
+Type=simple
+User=localserver
+ExecStart=/usr/bin/plebgpio
+AmbientCapabilities=CAP_FOWNER CAP_CHOWN
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

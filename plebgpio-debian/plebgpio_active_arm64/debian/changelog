@@ -1,0 +1,30 @@
+plebgpio (0.3-2) noble; urgency=low
+
+  * Minor installation refinements
+
+ -- Brian Button <bb@buttonnet.com>  Fri, 10 Apr 2025 11:01:00 +0500
+
+plebgpio (0.3-1) noble; urgency=low
+
+  * Update C code to match gpio
+  * Used ButtonNet config file
+
+ -- Brian Button <bb@buttonnet.com>  Fri, 14 Mar 2025 11:01:00 +0500
+
+plebgpio (0.3-0) noble; urgency=low
+
+  * Fix exit code for no rules
+
+ -- Brian Button <bb@buttonnet.com>  Tue, 17 Feb 2025 11:01:00 +0500
+
+plebgpio (0.2-3) noble; urgency=low
+
+  * Tune SystemD privilege/capabilities handling
+
+ -- Brian Button <bb@buttonnet.com>  Tue, 17 Feb 2025 11:01:00 +0500
+
+plebgpio (0.1-1) noble; urgency=low
+
+  * Wonderful program to print the name ;)
+
+ -- Brian Button <bb@buttonnet.com>  Tue, 12 Feb 2025 11:01:00 +0500
