@@ -1,3 +1,20 @@
 #!/usr/bin/make -f
 %:
 	dh $@
+
+override_dh_auto_configure:
+	ln -s ../../drank.c .
+	ln -s ../../file.c .
+	ln -s ../../ini.c .
+	ln -s ../../ini.h .
+	ln -s ../../parse.c .
+	ln -s ../../plebgpio.c .
+	ln -s ../../prog.c .
+	ln -s ../../static.c .
+	ln -s ../../util.c .
+	dh_auto_configure
+
+override_dh_auto_clean:
+	rm -f ini.h
+	rm -f *.c
+	dh_auto_clean

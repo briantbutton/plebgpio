@@ -1,3 +1,9 @@
+plebgpio (0.4-0) noble; urgency=low
+
+  * Reorganize rules in bnconfig.txt
+
+ -- Brian Button <bb@buttonnet.com>  Mon, 28 Apr 2025 11:01:00 +0500
+
 plebgpio (0.3-2) noble; urgency=low
 
   * Minor installation refinements

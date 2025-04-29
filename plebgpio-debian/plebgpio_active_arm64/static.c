@@ -9,6 +9,7 @@ static char test              = zero;
 static int  old_btn_bits      = zero;
 static int  old_led_bits      = zero;
 static int  problem           = zero;
+static int  off_edges         = four;
 
 typedef struct
 {

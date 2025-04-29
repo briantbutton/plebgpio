@@ -123,7 +123,9 @@ int step_program(gpio_v2_t *pins){
   int     bits                = 0,
           i                   = -1;
 
-  // printf("step_program, prog5 == %d, program == %d, prog_led == %d\n",prog5,program,prog_led);
+#if VERBOSE == 3
+  printf("step_program, prog5 == %d, program == %d, prog_led == %d\n",prog5,program,prog_led);
+#endif
 
   if( opcode==STOP || opcode==LOOP ){
     program_ix                = 0;
@@ -192,6 +194,7 @@ void set_leds(gpio_v2_t *pins, char off){
 void process_button ( int read_values , bn_gpio_btn* btn ) {
   char    string[4]           = {  32 ,  32 ,  32 ,   0 };
   char    fname[5]            = {  98 , 116 , 110 ,  48 ,   0 };
+  char    offname[4]          = { 111 , 102 , 102 ,   0 };
   char    fullpath[MAX_PATH];
   char    curr_val;
   bn_gpio_line* line;
@@ -211,6 +214,14 @@ void process_button ( int read_values , bn_gpio_btn* btn ) {
       printf("process_button: writing value '%c' to '%s'\n",string[0],fullpath);
 #endif
       line->val               = curr_val;
+      if ( btn->num==0 && ( ( curr_val==1 && 1<off_edges ) || ( curr_val==0 && 2<off_edges-- ) ) ) {
+        string[0]             = (1-curr_val)+ZEROTXT;
+        assemble_path(fullpath,"","",offname);
+        file_write ( fullpath , string , 1 );
+#if VERBOSE == 1 || VERBOSE == 2 || VERBOSE == 3
+      printf("process_button: writing value '%c' to '%s'\n",string[0],fullpath);
+#endif
+      }
     }
   }
 }
