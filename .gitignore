@@ -8,6 +8,15 @@ xtension
 files
 debhelper-build-stamp
 policy_templates
+plebgpio-debian/plebgpio_active_arm64/drank.c
+plebgpio-debian/plebgpio_active_arm64/file.c
+plebgpio-debian/plebgpio_active_arm64/ini.c
+plebgpio-debian/plebgpio_active_arm64/ini.h
+plebgpio-debian/plebgpio_active_arm64/parse.c
+plebgpio-debian/plebgpio_active_arm64/prog.c
+plebgpio-debian/plebgpio_active_arm64/static.c
+plebgpio-debian/plebgpio_active_arm64/util.c
+plebgpio_active_arm64/*.c
 raspi-example-gpio-first-orig.c
 raspi-example-gpio-orig.c
 raspi-example-gpio.c
