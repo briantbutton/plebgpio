@@ -105,11 +105,12 @@
 
 int main(int argc, char **argv) {
   char    delayms             = 125,
-          new_program         = initialize_config(argc,argv),
+          new_program         = initialize_config(),
           next_opcode         = LOOP,
           failed              = 0,
           bad_program         = 0,
           off                 = 0;
+  char*   arg1;
   int     i                   = -1,
           j                   = -1,
           cycles              = 1000000,
@@ -119,7 +120,16 @@ int main(int argc, char **argv) {
   unsigned delayns            = delayms*1000000;
 
   if ( config.line_count==0 ) return NO_LINES_CONFIGURED;
-
+  if(argc>1){
+    arg1                      = argv[1];
+    if(strlen(arg1)==3||strlen(arg1)==2){
+      if(arg1[0]==45&&arg1[1]==118){
+        printf("0.4-1\n");
+        return NO_PROBLEM;
+      }
+    }
+  }
+  
   ts.tv_nsec                  = delayns / overspeed;
   testlimit                   = test * 60 * 1000 * overspeed / ( delayms * gearing );
 

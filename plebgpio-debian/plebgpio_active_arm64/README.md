@@ -8,5 +8,5 @@
 	sudo debian/rules binary
 
 
-	sudo dpkg -i plebgpio_0.4-0_arm64.deb
+	sudo dpkg -i plebgpio_0.4-1_arm64.deb
 

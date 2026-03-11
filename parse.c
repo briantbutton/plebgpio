@@ -132,7 +132,7 @@ int handler(void* conf, const char* sect, const char* name, const char* valu){
 //  ~   ~    ~     ~      ~       ~        ~         ~          ~           ~            ~             ~
 // Reads config file and sets runtime data structures accordingly
 // 
-int initialize_config(int argc, char** argv){
+int initialize_config(){
   int     parse_result        = -1;;
   char    fullpath[MAX_PATH];
   char    string[4]           = {  32 ,  32 ,   0 };
